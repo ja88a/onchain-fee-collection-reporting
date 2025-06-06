@@ -1,0 +1,39 @@
+org: jabba01
+app: lifi-fee-collection-reporting
+service: events-scraper
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3003
+    lambdaPort: 3005
+
+functions:
+  scrapFeeCollectorEvents:
+    handler: dist/main.scrapFeeCollectorEvents
+    description: Scraps fee collector events for a specific chain
+    memorySize: 512
+    timeout: 30
+    environment:
+      NODE_ENV: dev
+      LOG_LEVEL: debug
+      MONGODB_PROTOCOL: mongodb
+      MONGODB_HOST: localhost
+      MONGODB_PORT: 27017
+      MONGODB_DEFAULT_DATABASE: lfcr
+    events:
+      - http: 
+          path: feecollection/scrap/{chain}
+          method: GET
+          request:
+            parameters:
+              paths:
+                chain: true
+
+provider:
+  name: aws
+  region: eu-west-3
+  runtime: nodejs20.x
+  stage: dev
