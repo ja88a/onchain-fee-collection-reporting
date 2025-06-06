@@ -1,0 +1,51 @@
+// {
+//   "extends": "../../tsconfig.base.json",
+//   "compilerOptions": {
+//     "module": "node16", // library mode
+//     "target": "es2020", // set to the *lowest* target
+//     "strict": true,
+//     "declaration": true,
+//     "sourceMap": true,
+//     "declarationMap": true,
+//     "outDir": "./dist",
+//     "verbatimModuleSyntax": false,
+//     "strictPropertyInitialization": false
+//   },
+//   "include": ["src", "test"],
+//   "exclude": ["node_modules", "dist"]
+// }
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "display": "Default",
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": false,
+    "incremental": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "lib": ["ES6"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "moduleDetection": "auto",
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "preserveWatchOutput": true,
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "target": "ES6",
+
+    "outDir": "./dist",
+  },
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "dist"]
+}
