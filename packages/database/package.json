@@ -1,0 +1,56 @@
+{
+  "name": "@jabba01/lfcr-database",
+  "version": "0.1.0",
+  "description": "MongoDB database client for the LI.FI FeeCollection Reporter offchain service.",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/onchain-fee-collection-reporting",
+    "type": "git"
+  },
+  "keywords": [],
+  "license": "AGPL-3.0-only",
+  "main": "dist/index",
+  "scripts": {
+    "clean": "shx rm -rf dist/* && rm -rf coverage/*",
+    "reset": "shx rm -rf dist node_modules .turbo coverage",
+    "build": "pnpm clean && tsc",
+    "build:prod": "pnpm clean && tsc -p tsconfig.build.json",
+    "build:webpack": "webpack --config webpack.config.js",
+    "watch": "tsc -w",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
+  },
+  "dependencies": {
+    "@jabba01/lfcr-common": "workspace:*",
+    "@lifi/types": "^17.17.0",
+    "ethers": "^5.8.0",
+    "@typegoose/typegoose": "^12.2.0",
+    "mongoose": "^8.15.1"
+  },
+  "devDependencies": {
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
