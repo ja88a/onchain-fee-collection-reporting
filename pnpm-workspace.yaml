@@ -1,0 +1,6 @@
+packages:
+  - externals/lifi-contract-types*
+  - packages/**/*
+  - test-e2e
+onlyBuiltDependencies:
+  - aws-sdk

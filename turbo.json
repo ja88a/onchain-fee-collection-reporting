@@ -1,0 +1,60 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalDependencies": [
+    "**/sample.env"
+  ],
+  "globalEnv": [
+  ],
+  "globalPassThroughEnv": [
+    "DATABASE_USER_NAME",
+    "DATABASE_USER_PWD"
+  ],
+  "tasks": {
+    "repo:init": {
+      "dependsOn": [
+        "^repo:init"
+      ]
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
+      "outputLogs": "new-only"
+    },
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ],
+      "outputLogs": "new-only"
+    },
+    "format": {
+      "dependsOn": [
+        "^format"
+      ],
+      "outputLogs": "new-only"
+    },
+    "clean": {
+      "cache": false
+    },
+    "test": {
+      "dependsOn": [
+        "^test"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "outputLogs": "new-only"
+    },
+    "start": {
+      "dependsOn": [
+        "^start"
+      ],
+      "cache": false,
+      "outputLogs": "full"
+    }
+  }
+}

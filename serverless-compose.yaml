@@ -1,0 +1,3 @@
+services:
+  events-scraper:
+    path: packages/events-scraper

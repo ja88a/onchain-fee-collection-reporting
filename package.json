@@ -1,0 +1,54 @@
+{
+  "name": "@jabba01/onchain-fee-collection-reporting-workspace",
+  "version": "0.1.0",
+  "description": "Workspace for the development of an off-chain reporting service for the onchain LI.FI FeeCollector events - off-chain web services",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/onchain-fee-collection-reporting",
+    "type": "git"
+  },
+  "keywords": [
+    "lifi",
+    "feecollector",
+    "report",
+    "offchain",
+    "services",
+    "events"
+  ],
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "scripts": {
+    "init:env": "find . -name 'sample.env' -execdir cp sample.env .env \\;",
+    "init:workspace": "git submodule update --init --recursive && pnpm install && turbo telemetry disable && pnpm build && pnpm init:env",
+    "build": "turbo build --log-order stream",
+    "docker:start": "docker compose up",
+    "docker:stop": "docker compose down",
+    "docker:down": "docker compose down",
+    "start": "turbo start --log-order stream",
+    "test": "turbo test",
+    "turbo:stop": "turbo daemon clean"
+  },
+  "devDependencies": {
+    "@serverless/compose": "^1.3.0",
+    "@types/node": "^22.15.30",
+    "esbuild": "^0.25.5",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.5.3",
+    "serverless": "^4.17.0",
+    "serverless-offline": "^14.4.0",
+    "shx": "^0.4.0",
+    "ts-loader": "^9.5.2",
+    "tsx": "^4.19.4",
+    "turbo": "^2.5.4",
+    "typescript": "5.7.3",
+    "vitest": "^2.1.9"
+  },
+  "packageManager": "pnpm@10.11.1",
+  "engines": {
+    "node": ">=20"
+  }
+}

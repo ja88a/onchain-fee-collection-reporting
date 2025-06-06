@@ -1,0 +1,66 @@
+version: '3.8'
+
+volumes:
+  db_data:
+    driver: local
+  lfcr_data: {}
+
+networks:
+  lfcr-network:
+    driver: bridge
+
+services:
+  # # FeeCollector Reporter API service
+  # lfcr-report:
+  #   container_name: lfcr-report
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #     target: fees-reporter
+  #   image: lfcr-report
+  #   depends_on:
+  #     - lfcr-cache
+  #     - lfcr-db
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     NODE_ENV: production
+  #     LOG_LEVEL: info # warn
+  #     OPENAPI_PUBLISH: true
+  #     MONGODB_PROTOCOL: mongodb
+  #     MONGODB_HOST: lfcr-db
+  #     MONGODB_PORT: 27017
+  #     MONGODB_DEFAULT_DATABASE: lfcr
+  #     REDIS_ENDPOINT: 'lfcr-cache:6379'
+  #     REDIS_PASSWORD: 'hSy2TiQFw8Yyzs4oxqjzwvoM'
+  #   links:
+  #     - lfcr-cache
+  #     - lfcr-db
+  #   volumes:
+  #     - lfcr_data:/lfcr/data:rw
+  #   networks:
+  #     - lfcr-network
+
+  # # KV Cache
+  # lfcr-cache:
+  #   container_name: lfcr-cache
+  #   image: redis:7.2.3-alpine3.18
+  #   restart: unless-stopped
+  #   ports:
+  #     - '6379:6379'
+  #   command: redis-server --save 20 1 --loglevel warning --requirepass hSy2TiQFw8Yyzs4oxqjzwvoM
+  #   volumes: 
+  #     - db_data:/lfcr/cache:rw
+  #   networks:
+  #     - lfcr-network
+
+  # Database
+  lfcr-db:
+    image: mongo:8.0
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - db_data:/lfcr/db:rw
+    networks:
+      - lfcr-network
