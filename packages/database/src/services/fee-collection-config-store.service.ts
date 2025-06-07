@@ -1,22 +1,26 @@
 import {
   EEventScrapingStatus,
-  FeeCollectorChainConfig,
+  FeeCollectionScrapingConfig,
 } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { ChainKey, ChainType } from '@lifi/types'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import { Document, Types } from 'mongoose'
-import { DbError } from './database.utils'
-import { FeeCollectionOnchainConfigModel, FeeCollectionOnchainConfigDoc } from './models'
+import { DbError } from '../database.utils'
+import { getFeeCollectionScrapingConfigModel, FeeCollectionScrapingConfigDoc } from '../models'
 
 /**
  * Service for storing and retrieving onchain-related scraping information data about FeeCollector events
  */
-export class StoreEventScrapingChainConfig {
+export class FeeCollectionConfigStore {
   /** Private logger */
   private readonly logger = wLogger.child({
-    label: StoreEventScrapingChainConfig.name,
+    label: FeeCollectionConfigStore.name,
   })
+
+  /** Mongoose model for FeeCollector event scraping configuration */
+  private readonly FeeCollectionOnchainConfigModel =
+    getFeeCollectionScrapingConfigModel()
 
   /**
    * Create a new EventScrapingInfo document in the database
@@ -26,15 +30,15 @@ export class StoreEventScrapingChainConfig {
    */
   async createFeeCollectorEventScrapingConfig(
     chainKey: string,
-    feeCollectorChainConfig: FeeCollectorChainConfig
-  ): Promise<FeeCollectorChainConfig> {
+    feeCollectorChainConfig: FeeCollectionScrapingConfig
+  ): Promise<FeeCollectionScrapingConfig> {
     const config = Object.assign({ chainKey: chainKey }, feeCollectorChainConfig)
     this.logger.info(
-      `Creating a new FeeCollector scraping config for chain '${chainKey}' in DB: ${JSON.stringify(config)}`
+      `Creating a new Fee Collection Scraping config for chain '${chainKey}' in DB: ${JSON.stringify(config)}`
     )
-    const doc = await FeeCollectionOnchainConfigModel.create(config).catch((err) => {
+    const doc = await this.FeeCollectionOnchainConfigModel.create(config).catch((err) => {
       throw new DbError(
-        `Failed to create FeeCollector event scraping config for chain '${chainKey}'. \n${err}`
+        `Failed to create Fee Collection Scraping config for chain '${chainKey}'. \n${err}`
       )
     })
     return this.convertToEntity(doc)
@@ -45,8 +49,10 @@ export class StoreEventScrapingChainConfig {
    * @param chainKey the unique LI.FI key of the blockchain hosting the FeeCollector contract
    * @returns instance of the stored FeeCollector event onchain scraping information
    */
-  async getByChain(chainKey: string): Promise<FeeCollectorChainConfig | undefined> {
-    const doc = await FeeCollectionOnchainConfigModel.findOne({ chainKey: chainKey }).exec()
+  async getByChain(chainKey: string): Promise<FeeCollectionScrapingConfig | undefined> {
+    const doc = await this.FeeCollectionOnchainConfigModel.findOne({
+      chainKey: chainKey,
+    }).exec()
     if (doc === null) {
       this.logger.warn(
         `No event scraping configuration available for chain '${chainKey}'`
@@ -62,26 +68,25 @@ export class StoreEventScrapingChainConfig {
    * @returns the updated FeeCollector event scraping information
    */
   async updateFeeCollectorLastScanInfo(
-    config: FeeCollectorChainConfig,
+    config: FeeCollectionScrapingConfig,
     lastScannedBlock: number
-  ): Promise<FeeCollectorChainConfig> {
+  ): Promise<FeeCollectionScrapingConfig> {
     config.feeCollector.lastScanBlock = lastScannedBlock
     config.feeCollector.lastScanTime = Date.now()
-    const doc = await FeeCollectionOnchainConfigModel
-      .findByIdAndUpdate(
-        config.docId,
-        { feeCollector: config.feeCollector },
-        { new: false }
-      )
+    const doc = await this.FeeCollectionOnchainConfigModel.findByIdAndUpdate(
+      config.docId,
+      { feeCollector: config.feeCollector },
+      { new: false }
+    )
       .exec()
       .catch((err) => {
         throw new DbError(
-          `Failed to update FeeCollector event scraping config '${config.docId}' with last scan info - block '${lastScannedBlock}'. \n${err}`
+          `Failed to update FeeCollection event scraping config '${config.docId}' with last scan info - block '${lastScannedBlock}'. \n${err}`
         )
       })
     if (doc === null) {
       throw new DbError(
-        `No FeeCollector event scraping config '${config.docId}' found to report last scan info - block '${lastScannedBlock}'`
+        `No FeeCollection event scraping config '${config.docId}' found to report last scan info - block '${lastScannedBlock}'`
       )
     }
     return this.convertToEntity(doc)
@@ -93,9 +98,9 @@ export class StoreEventScrapingChainConfig {
    * @returns the FeeCollector Chain configuration
    */
   private convertToEntity(
-    doc: Document<unknown, BeAnObject, FeeCollectionOnchainConfigDoc> &
-      Omit<FeeCollectionOnchainConfigDoc & { _id: Types.ObjectId }, ''>
-  ): FeeCollectorChainConfig {
+    doc: Document<unknown, BeAnObject, FeeCollectionScrapingConfigDoc> &
+      Omit<FeeCollectionScrapingConfigDoc & { _id: Types.ObjectId }, ''>
+  ): FeeCollectionScrapingConfig {
     return {
       docId: doc.id,
       version: doc.version,

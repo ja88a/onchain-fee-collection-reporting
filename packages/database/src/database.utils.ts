@@ -3,6 +3,7 @@
  */
 export class EventScrapingUtils {
   private static idPrefixEventScrapingInfo = 'evtScrap'
+
   private static idPrefixContractFeeCollector = 'feecollect'
 
   /**
@@ -11,7 +12,13 @@ export class EventScrapingUtils {
    * @returns the computed database entry ID
    */
   static computeIdEventScrapingFeeCollector(chainKey: string): string {
-    return this.idPrefixEventScrapingInfo + '_' + this.idPrefixContractFeeCollector + '_' + chainKey
+    return (
+      this.idPrefixEventScrapingInfo +
+      '_' +
+      this.idPrefixContractFeeCollector +
+      '_' +
+      chainKey
+    )
   }
 }
 
@@ -20,6 +27,7 @@ export class EventScrapingUtils {
  */
 export class FeeCollectedEventUtils {
   private static idPrefixEvent = 'event'
+
   private static idPrefixEventFeeCollected = 'feecollected'
 
   /**
@@ -28,13 +36,21 @@ export class FeeCollectedEventUtils {
    * @returns the computed database entry ID
    */
   static computeIdEventFeeCollected(chainKey: string, txHash: string): string {
-    return this.idPrefixEvent + '_' + this.idPrefixEventFeeCollected + '_' + chainKey + '_' + txHash
+    return (
+      this.idPrefixEvent +
+      '_' +
+      this.idPrefixEventFeeCollected +
+      '_' +
+      chainKey +
+      '_' +
+      txHash
+    )
   }
 }
 
 export class DbError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'DbError';
+    super(message)
+    this.name = 'DbError'
   }
 }

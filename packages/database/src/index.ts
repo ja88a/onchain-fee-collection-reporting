@@ -1,4 +1,4 @@
 export * from './models'
+export * from './services'
 export * from './database.utils'
-export * from './event-scraper-chain-config.service'
-export * from './fee-collected-event.service'
+export * from './database.service'

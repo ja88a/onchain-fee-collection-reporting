@@ -1,11 +1,12 @@
 import {
   getModelForClass,
   modelOptions,
+  mongoose,
   prop,
-  ReturnModelType,
   Severity,
 } from '@typegoose/typegoose'
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
+import { DbError } from '../database.utils'
 
 /**
  * Data structure for a parsed FeeCollectedEvent emitted by FeeCollector contracts
@@ -52,6 +53,13 @@ export class FeeCollectionEventDoc extends TimeStamps {
   public lifiFee!: string
 }
 
-/** Doc model of the LI.FI fee collection events */
-export const FeeCollectionEventModel: ReturnModelType<typeof FeeCollectionEventDoc> =
-  getModelForClass(FeeCollectionEventDoc)
+/** 
+ * Get the doc model of the LI.FI fee collection events 
+ */
+export const getFeeCollectionEventModel = () => {
+  // Only get the model when the connection is established
+  if (mongoose.connection.readyState !== 1) {
+    throw new DbError('getFeeCollectionEventModel - MongoDB connection not ready')
+  }
+  return getModelForClass(FeeCollectionEventDoc)
+}

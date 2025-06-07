@@ -1,8 +1,9 @@
-import { getModelForClass, ReturnModelType } from '@typegoose/typegoose'
+import { getModelForClass, mongoose } from '@typegoose/typegoose'
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { Severity } from '@typegoose/typegoose/lib/internal/constants'
 import { modelOptions } from '@typegoose/typegoose/lib/modelOptions'
 import { prop } from '@typegoose/typegoose/lib/prop'
+import { DbError } from '../database.utils'
 
 /**
  * Configuration settings for the target blockchain to scan
@@ -53,7 +54,7 @@ class FeeCollectorProperties {
   schemaOptions: { collection: 'FeeCollectionOnchainConfig', versionKey: 'version' },
   options: { disableCaching: false, allowMixed: Severity.ALLOW },
 })
-export class FeeCollectionOnchainConfigDoc extends TimeStamps {
+export class FeeCollectionScrapingConfigDoc extends TimeStamps {
   /** Model version number */
   @prop({ required: true })
   public version?: number
@@ -76,6 +77,10 @@ export class FeeCollectionOnchainConfigDoc extends TimeStamps {
 }
 
 /** The configuration model for LI.FI fee collection's event scraping */
-export const FeeCollectionOnchainConfigModel: ReturnModelType<
-  typeof FeeCollectionOnchainConfigDoc
-> = getModelForClass(FeeCollectionOnchainConfigDoc)
+export const getFeeCollectionScrapingConfigModel = () => {
+  // Only get the model when the connection is established
+  if (mongoose.connection.readyState !== 1) {
+    throw new DbError('MongoDB connection not ready')
+  }
+  return getModelForClass(FeeCollectionScrapingConfigDoc)
+}

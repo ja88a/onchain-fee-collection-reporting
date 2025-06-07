@@ -17,7 +17,7 @@
   "scripts": {
     "clean": "shx rm -rf dist/* && rm -rf coverage/*",
     "reset": "shx rm -rf dist node_modules .turbo coverage",
-    "build": "pnpm clean && tsc",
+    "build": "tsc",
     "build:prod": "pnpm clean && tsc -p tsconfig.build.json",
     "build:webpack": "webpack --config webpack.config.js",
     "watch": "tsc -w",

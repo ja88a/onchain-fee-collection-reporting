@@ -1,4 +1,4 @@
-import { FeeCollectionEventDoc, FeeCollectionEventModel } from './models'
+import { FeeCollectionEventDoc, getFeeCollectionEventModel } from '../models'
 import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { BigNumber } from 'ethers/lib/ethers'
@@ -6,10 +6,13 @@ import { BigNumber } from 'ethers/lib/ethers'
 /**
  * Service for storing and retrieving FeeCollected events emitted by the FeeCollector contract to/from the database
  */
-export class StoreFeeCollectedEvent {
+export class FeeCollectedEventStore {
   private readonly logger = wLogger.child({
-    label: StoreFeeCollectedEvent.name,
+    label: FeeCollectedEventStore.name,
   })
+
+  /** Doc model for FeeCollectionEvent */
+  private readonly FeeCollectionEventModel = getFeeCollectionEventModel()
 
   /**
    * Create a new FeeCollectedEvent document in the database
@@ -20,7 +23,7 @@ export class StoreFeeCollectedEvent {
    */
   async createFeeCollectedEvent(feeCollectedEvent: FeeCollectedEventParsed) {
     const doc = this.convertToDoc(feeCollectedEvent)
-    return await FeeCollectionEventModel.create(doc)
+    return await this.FeeCollectionEventModel.create(doc)
   }
 
   /**
@@ -33,11 +36,11 @@ export class StoreFeeCollectedEvent {
     const dbEntries = feeCollectedEvents.map((feeCollectedEvent) => {
       return this.convertToDoc(feeCollectedEvent)
     })
-    return await FeeCollectionEventModel
-      .insertMany(dbEntries, { ordered: false })
-      .catch((err) => {
+    return await this.FeeCollectionEventModel.insertMany(dbEntries, { ordered: false }).catch(
+      (err) => {
         this.logger.warn(`Attempted to insert already stored events. \n${err}`)
-      })
+      }
+    )
   }
 
   /**
@@ -48,7 +51,7 @@ export class StoreFeeCollectedEvent {
   async retrieveFeeCollectedEventsByIntegrator(
     integratorId: string
   ): Promise<FeeCollectedEventParsed[]> {
-    const feeCollectedEvents = await FeeCollectionEventModel.find({
+    const feeCollectedEvents = await this.FeeCollectionEventModel.find({
       integrator: integratorId,
     })
     return feeCollectedEvents.map((feeCollectedEvent) => {
@@ -56,8 +59,10 @@ export class StoreFeeCollectedEvent {
     })
   }
 
-  /** Mapping utilty method: Convert an external data model to a doc entry */
-  private convertToDoc(feeCollectedEvent: FeeCollectedEventParsed): FeeCollectionEventDoc {
+  /** Mapping utility method: Convert an external data model to a doc entry */
+  private convertToDoc(
+    feeCollectedEvent: FeeCollectedEventParsed
+  ): FeeCollectionEventDoc {
     return {
       chainKey: feeCollectedEvent.chainKey,
       txHash: feeCollectedEvent.txHash,
@@ -69,7 +74,7 @@ export class StoreFeeCollectedEvent {
     }
   }
 
-  /** Mapping utilty method: Convert a stored doc into an external data model instance */
+  /** Mapping utility method: Convert a stored doc into an external data model instance */
   private convertToEntity(doc): FeeCollectedEventParsed {
     return {
       docId: doc.id,
