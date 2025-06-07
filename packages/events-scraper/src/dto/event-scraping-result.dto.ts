@@ -7,7 +7,7 @@ export type ResultEventScrapingSession = {
 
   /** Number of new onchain events collected */
   eventsNew: number
-  
+
   /** User friendly sumup message */
   message: string
 }

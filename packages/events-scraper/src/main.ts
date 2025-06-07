@@ -1,8 +1,8 @@
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
-import { Callback, Context, Handler } from 'aws-lambda'
-
-import { FeeCollectionEventScraper } from './events-scraper.service'
+import { DatabaseConnector } from '@jabba01/lfcr-database'
 import { ChainKey } from '@lifi/types'
+import { Callback, Context, Handler } from 'aws-lambda'
+import { FeeCollectionEventScraper } from './events-scraper.service'
 
 /** Private logger */
 const logger = wLogger.child({
@@ -24,34 +24,48 @@ export const scrapFeeCollectorEvents: Handler = async (
   _context: Context,
   _callback: Callback
 ) => {
-  const { chain } = event.pathParameters
+  const { chainKey } = event.pathParameters
   logger.debug(
-    `Lambda function invoked for Scraping events from chain '${chain}' - Context: ${JSON.stringify(_context)}`
+    `Lambda function invoked for Scraping events from chain '${chainKey}' - Context: ${JSON.stringify(_context)}`
   )
-  return await startScraping(chain, _context.awsRequestId)
+
+  // Initialize MongoDB connection with default config or from the set environment variables
+  await DatabaseConnector.init().catch((error) => {
+    logger.error(
+      `Failed to initialize database connection - Request ID: '${_context.awsRequestId}'.\n${error.stack ?? error}`
+    )
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Failed to initialize database connection',
+        // error: error.message || 'Unknown error',
+      }),
+    }
+  })
+
+  // Extract and store the onchain fees collected events
+  return await startScraping(chainKey, _context.awsRequestId)
+    .catch((error) => {
+      logger.error(
+        `Failed to scrap events from chain '${chainKey}' - Request ID: '${_context.awsRequestId}'.\n${error.stack ?? error}`
+      )
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: `Failed to start scraping events from chain '${chainKey}'`,
+          // error: error.message || 'Unknown error',
+        }),
+      }
+    })
+    .finally(() => {
+      // Close the database connection after processing
+      DatabaseConnector.close().catch((error) => {
+        logger.error(
+          `Failed to close database connection - Request ID: '${_context.awsRequestId}'.\n${error.stack ?? error}`
+        )
+      })
+    })
 }
-
-// /** Local persistence of an already created application context - Required for the Lambda function's runtime context */
-// let appContext: INestApplicationContext
-
-// /**
-//  * Avoid recreating an application context if a previously created one
-//  * is still available in the context of the serverless function
-//  */
-// async function getAppContext(): Promise<INestApplicationContext> {
-//   if (appContext == null) {
-//     appContext = await NestFactory.createApplicationContext(EventsScraperModule, {
-//       logger:
-//         process.env.NODE_ENV === 'production'
-//           ? ['fatal', 'error', 'warn']
-//           : ['fatal', 'error', 'warn', 'log', 'debug'],
-//     }).catch((err) => {
-//       logger.error(`Application context has failed to init`, err)
-//       return Promise.reject(err)
-//     })
-//   }
-//   return appContext
-// }
 
 /**
  * Initiates the FeeCollectorEventsScraper service and starts a blockchain scanning session.
@@ -62,7 +76,7 @@ export const scrapFeeCollectorEvents: Handler = async (
 async function startScraping(chain: string, requestId: string) {
   // Validate the input chain key
   if (!Object.values(ChainKey).includes(<ChainKey>chain)) {
-    logger.error(`Invalid chain key '${chain}' in request ${requestId}`)
+    logger.error(`Invalid chain key '${chain}' in request '${requestId}' - Events Scraping session aborted`)
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -76,15 +90,11 @@ async function startScraping(chain: string, requestId: string) {
   const chainKey = <ChainKey>chain
 
   // Scrap latest FeeCollection events for the specified chain
-  try {
-    const res = await appService.scrapFeeCollectorEvents(chainKey)
-    return {
-      statusCode: 200,
-      body: JSON.stringify(res),
-    }
-  } catch (error: any) {
-    const msgGenericMsg = `Failed to scrap FeeCollection events from chain '${chainKey}'`
-    logger.error(`${msgGenericMsg} - Events Scraping session '${requestId}' ABORTED\n`, error)
+  const res = await appService.scrapFeeCollectorEvents(chainKey).catch((error: any) => {
+    const msgGenericMsg = `Failed to scrap FeeCollector events from chain '${chainKey}'`
+    logger.error(
+      `${msgGenericMsg} - Events Scraping session '${requestId}' ABORTED\n${error.stack ?? error}`
+    )
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -92,6 +102,11 @@ async function startScraping(chain: string, requestId: string) {
         // error: error.response ?? error.message
       }),
     }
+  })
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(res),
   }
 }
 
@@ -99,10 +114,20 @@ async function startScraping(chain: string, requestId: string) {
 // For automated local launch only - It has no effect in a serverless deployment context
 if (process.env.DEV_MODE === '1') {
   const startTime = new Date()
-  startScraping(ChainKey.POL, startTime.toISOString())
-    .then((res) => {
-      const duration = new Date().getTime() - startTime.getTime()
-      logger.info(`Process duration: ${duration / 1000}s - Result: ${JSON.stringify(res)}`)
+  DatabaseConnector.init()
+    .then(async () => {
+      await startScraping(ChainKey.POL, startTime.toISOString()).then((res) => {
+        const duration = new Date().getTime() - startTime.getTime()
+        logger.info(
+          `Process duration: ${duration / 1000}s - Result: ${JSON.stringify(res)}`
+        )
+      })
+    })
+    .catch((error) => {
+      logger.error(
+        `Failed to initialize database connection in DEV_MODE.\n${error.stack ?? error}`
+      )
+      process.exit(1)
     })
     .finally(() => process.exit())
 }
