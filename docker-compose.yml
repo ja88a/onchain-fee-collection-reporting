@@ -1,5 +1,3 @@
-version: '3.8'
-
 volumes:
   db_data:
     driver: local
@@ -60,7 +58,16 @@ services:
     restart: unless-stopped
     ports:
       - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=lfcr
+    command: mongod --setParameter maxTransactionLockRequestTimeoutMillis=5000 --setParameter maxTransactionLockRequestTimeoutMillis=5000 --wiredTigerCacheSizeGB=1
     volumes:
       - db_data:/lfcr/db:rw
     networks:
       - lfcr-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/lfcr --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
