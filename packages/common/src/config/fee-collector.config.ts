@@ -2,8 +2,8 @@ import { ChainKey, ChainType, ChainId } from '@lifi/types'
 import {
   EBlockTagLatest,
   EEventScrapingStatus,
-  FeeCollectorChainConfig,
-} from '../data/fee-collector-chain.entity'
+  FeeCollectionScrapingConfig,
+} from '../data/fee-collection-scraping-config.entity'
 
 /** Latest current version number of the FeeCollector Chain config schema */
 export const VERSION_FEE_COLLECTOR_CHAIN_CONFIG_LATEST = 1
@@ -14,8 +14,7 @@ export const CHAIN_SCAN_BLOCKS_BATCH_SIZE = process.env.CHAIN_SCAN_BLOCKS_BATCH_
   : 2000
 
 /** Default block tags to use for retrieving the latest available block on a blockchain */
-export const CHAIN_LATEST_BLOCK_TAG =
-  process.env.CHAIN_LATEST_BLOCK_TAG || 'finalized'
+export const CHAIN_LATEST_BLOCK_TAG = process.env.CHAIN_LATEST_BLOCK_TAG || 'finalized'
 
 /** Default number of chain query attempts when previous has failed. Number of attempts before throwing an error. */
 export const CHAIN_QUERY_FAIL_RETRY_NB = process.env.CHAIN_QUERY_FAIL_RETRY_NB
@@ -23,7 +22,7 @@ export const CHAIN_QUERY_FAIL_RETRY_NB = process.env.CHAIN_QUERY_FAIL_RETRY_NB
   : 2
 
 /** Map of FeeCollector scraping config for the supported blockchains */
-export const feeCollectorChainConfigDefault: Map<string, FeeCollectorChainConfig> =
+export const feeCollectorChainConfigDefault: Map<string, FeeCollectionScrapingConfig> =
   new Map([
     [
       // Polygon Mainnet

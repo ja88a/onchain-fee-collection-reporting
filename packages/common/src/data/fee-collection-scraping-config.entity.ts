@@ -2,26 +2,26 @@ import { ChainKey, ChainType, ChainId } from '@lifi/types'
 
 /** Supported statuses for the scraping of events on a blockchain */
 export const enum EEventScrapingStatus {
-    /** Running events scraping sessions is enabled */
-    ACTIVE = 'active',
-    /** The chain config is disabled, no scraping session shall be initiated */
-    INACTIVE = 'inactive',
+  /** Running events scraping sessions is enabled */
+  ACTIVE = 'active',
+  /** The chain config is disabled, no scraping session shall be initiated */
+  INACTIVE = 'inactive',
 }
 
 /** Default block tags to use for retrieving the last available block on a blockchain */
 export const enum EBlockTagLatest {
-    /** Safe to use block, almost confirmed/finalized */
-    SAFE ='safe',
-    /** Latest finalized block */
-    FINALIZED = 'finalized',
-    /** Latest minted block */
-    LATEST = 'latest',
-    /** Default tag to retrieve last block */
-    default = FINALIZED
+  /** Safe to use block, almost confirmed/finalized */
+  SAFE = 'safe',
+  /** Latest finalized block */
+  FINALIZED = 'finalized',
+  /** Latest minted block */
+  LATEST = 'latest',
+  /** Default tag to retrieve last block */
+  default = FINALIZED,
 }
 
 /** Configuration of onchain LiFi FeeCollector contracts */
-export type FeeCollectorChainConfig = {
+export type FeeCollectionScrapingConfig = {
   /** the unique target blockchain key, based on LI.FI data types */
   readonly chainKey?: ChainKey
 

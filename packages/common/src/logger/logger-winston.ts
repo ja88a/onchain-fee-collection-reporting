@@ -28,7 +28,7 @@ const winstonConfigProd: LoggerOptions = {
     }),
     format.splat(),
     format.errors({ stack: true }),
-    format.json(),
+    format.json()
   ),
   defaultMeta: { service: 'lifi-fcr' },
   transports: [
@@ -44,8 +44,6 @@ const winstonConfigProd: LoggerOptions = {
  * WinstonJS Logger integration in development mode
  *
  * Refer to [winstonjs/winston](https://github.com/winstonjs/winston)
- *
- * Integrates an automatic Daily File Rotation for local log files and a retention policy over time
  */
 const winstonConfigDev: LoggerOptions = {
   level: logsMinLevel,
@@ -54,17 +52,19 @@ const winstonConfigDev: LoggerOptions = {
     format.timestamp({
       format: TIMESTAMP_PATTERN,
     }),
-    format.splat(),
     format.errors({ stack: true }),
-    format.json(),
+    format.json()
   ),
   transports: [
-    // Console output pretty formatted
+    // Console output
     new transports.Console({
       format: format.combine(
-        format.ms(),
-        format.colorize({all: !IS_NODE_PROD}),
-        format.prettyPrint({colorize: !IS_NODE_PROD})
+        format.colorize(),
+        format.printf(({ timestamp, level, message, label, ...rest }) => {
+          return `${timestamp} ${level} [${label || 'app'}]: ${message} ${
+            Object.keys(rest).length ? JSON.stringify(rest) : ''
+          }`
+        })
       ),
       handleExceptions: true,
       handleRejections: true,
@@ -75,9 +75,16 @@ const winstonConfigDev: LoggerOptions = {
 /**
  * Winston Logger instance, to be used as the default logger.
  *
- * If we detect running in a container / an ECS or k8s environment, the `NODE_ENV` env variable
+ * If running in a container / an ECS or K8s environment, the `NODE_ENV` env variable
  * must be set to `production` to output logs in a one line JSON format.
  */
-export const logger = createLogger(
-  IS_NODE_PROD ? winstonConfigProd : winstonConfigDev,
-)
+export const logger = createLogger(IS_NODE_PROD ? winstonConfigProd : winstonConfigDev)
+
+// // Temporary console logger implementation
+// export const logger = {
+//   debug: (message: string) => console.debug(`DEBUG - ${message}`),
+//   info: (message: string) => console.info(`INFO  - ${message}`),
+//   warn: (message: string) => console.warn(`WARN  - ${message}`),
+//   error: (message: string) => console.error(`ERROR - ${message}`),
+//   child: (_options?: { label?: string }) => logger,
+// }

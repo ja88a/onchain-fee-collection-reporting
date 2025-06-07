@@ -1,2 +1,2 @@
-export * from './fee-collector-event.entity'
-export * from './fee-collector-chain.entity'
+export * from './fee-collected-event.entity'
+export * from './fee-collection-scraping-config.entity'
