@@ -45,7 +45,7 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.15.30)(terser@5.41.0)
 
-  externals/lifi-contract-types:
+  lib/lifi-contract-types:
     dependencies:
       '@ethersproject/abi':
         specifier: ^5.5.0
@@ -163,15 +163,15 @@ importers:
       '@jabba01/lfcr-database':
         specifier: workspace:*
         version: link:../database
+      '@jabba01/lfcr-lifi-contract-typings-feecollector':
+        specifier: workspace:*
+        version: link:../lifi-contract-typings-feecollector
       '@lifi/types':
         specifier: ^17.17.0
         version: 17.17.0(typescript@5.8.3)
       ethers:
         specifier: ^5.8.0
         version: 5.8.0
-      lifi-contract-typings:
-        specifier: workspace:*
-        version: link:../../externals/lifi-contract-types
 
   packages/events-scraper-serverless:
     dependencies:
@@ -194,6 +194,25 @@ importers:
       '@types/aws-lambda':
         specifier: ^8.10.149
         version: 8.10.149
+
+  packages/lifi-contract-typings-feecollector:
+    dependencies:
+      '@ethersproject/abi':
+        specifier: ^5.8.0
+        version: 5.8.0
+      '@ethersproject/bytes':
+        specifier: ^5.8.0
+        version: 5.8.0
+      '@ethersproject/providers':
+        specifier: ^5.8.0
+        version: 5.8.0
+      ethers:
+        specifier: ^5.8.0
+        version: 5.8.0
+    devDependencies:
+      lifi-contract-typings:
+        specifier: workspace:*
+        version: link:../../lib/lifi-contract-types
 
 packages:
 

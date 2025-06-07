@@ -18,7 +18,7 @@ import {
 import { ChainKey } from '@lifi/types'
 import { BigNumber, ethers } from 'ethers'
 import { ResultEventScrapingSession } from './dto/event-scraping-result.dto'
-import { FeeCollector__factory } from 'lifi-contract-typings'
+import { FeeCollector__factory } from '../../lifi-contract-typings-feecollector/dist/FeeCollector'
 
 /**
  * Service for scraping LI.FI FeeCollector contracts' events.

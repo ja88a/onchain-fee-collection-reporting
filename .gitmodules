@@ -1,3 +1,3 @@
-[submodule "externals/lifi-contract-types"]
-	path = externals/lifi-contract-types
+[submodule "lib/lifi-contract-types"]
+	path = lib/lifi-contract-types
 	url = https://github.com/lifinance/lifi-contract-types.git

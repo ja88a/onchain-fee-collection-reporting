@@ -31,7 +31,7 @@
     "@jabba01/lfcr-database": "workspace:*",
     "@lifi/types": "^17.17.0",
     "ethers": "^5.8.0",
-    "lifi-contract-typings": "workspace:*"
+    "@jabba01/lfcr-lifi-contract-typings-feecollector": "workspace:*"
   },
   "devDependencies": {
   }

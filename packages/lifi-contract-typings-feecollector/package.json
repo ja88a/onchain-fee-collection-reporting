@@ -1,0 +1,32 @@
+{
+  "name": "@jabba01/lfcr-lifi-contract-typings-feecollector",
+  "version": "0.1.0",
+  "description": "Utility package that extracts and bundles the LI.FI FeeCollector contract typings for use in the FeeCollection Reporter offchain service.",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/onchain-fee-collection-reporting",
+    "type": "git"
+  },
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "main": "dist/FeeCollector",
+  "scripts": {
+    "clean": "shx rm -rf dist/*",
+    "reset": "shx rm -rf dist node_modules .turbo",
+    "build": "esbuild --bundle --outfile=./dist/FeeCollector.js --platform=node --target=node20 --minify --sourcemap ../../lib/lifi-contract-types/src/factories/FeeCollector__factory.ts",
+    "bundle:lifi-contract-typings": "esbuild --bundle --outfile=./dist/FeeCollector-index.js --platform=node --target=node20 --minify --sourcemap ../../lib/lifi-contract-types/src/index.ts"
+  },
+  "dependencies": {
+    "@ethersproject/abi": "^5.8.0",
+    "@ethersproject/bytes": "^5.8.0",
+    "@ethersproject/providers": "^5.8.0",
+    "ethers": "^5.8.0"
+  },
+  "devDependencies": {
+    "lifi-contract-typings": "workspace:*"
+  }
+}
