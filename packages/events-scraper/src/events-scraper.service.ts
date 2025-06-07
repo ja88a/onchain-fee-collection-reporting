@@ -17,8 +17,8 @@ import {
 } from '@jabba01/lfcr-database'
 import { ChainKey } from '@lifi/types'
 import { BigNumber, ethers } from 'ethers'
-import { FeeCollector__factory } from 'lifi-contract-typings'
 import { ResultEventScrapingSession } from './dto/event-scraping-result.dto'
+import { FeeCollector__factory } from 'lifi-contract-typings'
 
 /**
  * Service for scraping LI.FI FeeCollector contracts' events.
@@ -119,7 +119,7 @@ export class FeeCollectionEventScraper {
    * @param feeCollectorContract the FeeCollector contract instance
    * @returns the last block number and the BlockTag used to retrieve it
    */
-  private async getChainLastBlock(
+  async getChainLastBlock(
     chainConfig: FeeCollectionScrapingConfig,
     feeCollectorContract: ethers.Contract,
     nbRetries?: number
@@ -251,6 +251,8 @@ export class FeeCollectionEventScraper {
 
   /**
    * Initializes the FeeCollector contract instance for the given chain.
+   * This method creates a virtual contract instance using the provided contract address and RPC provider URL.
+   * 
    * @param contractAddress The address of the FeeCollector contract.
    * @param providerRpcUrl The URL of the RPC provider.
    * @returns The virtual FeeCollector contract instance.

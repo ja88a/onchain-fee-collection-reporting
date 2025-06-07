@@ -13,24 +13,24 @@ custom:
 functions:
   scrapFeeCollectorEvents:
     handler: dist/main.scrapFeeCollectorEvents
-    description: Scraps fee collector events for a specific chain
+    description: Scrap the fee collected events of a LI.FI FeeCollector contract on a given chain
     memorySize: 512
     timeout: 30
     environment:
       NODE_ENV: dev
-      LOG_LEVEL: debug
+      LOG_LEVEL: info
       MONGODB_PROTOCOL: mongodb
       MONGODB_HOST: localhost
       MONGODB_PORT: 27017
       MONGODB_DEFAULT_DATABASE: lfcr
     events:
       - http: 
-          path: feecollection/scrap/{chain}
+          path: feecollected-scraping/{chainKey}
           method: GET
           request:
             parameters:
               paths:
-                chain: true
+                chainKey: true
 
 provider:
   name: aws
