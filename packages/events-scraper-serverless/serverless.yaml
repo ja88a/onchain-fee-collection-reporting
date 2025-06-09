@@ -19,10 +19,9 @@ functions:
     environment:
       NODE_ENV: dev
       LOG_LEVEL: info
-      MONGODB_PROTOCOL: mongodb
       MONGODB_HOST: localhost
       MONGODB_PORT: 27017
-      MONGODB_DEFAULT_DATABASE: lfcr
+      MONGODB_DATABASE: fee-collection-reporting
     events:
       - http: 
           path: feecollected-scraping/{chainKey}

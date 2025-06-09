@@ -22,14 +22,14 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "vitest run",
     "build": "tsc",
-    "build:prod": "pnpm clean && esbuild --bundle --outfile=./dist/main.js --platform=node --target=node20 --minify --sourcemap ./src/main.ts",
+    "build:bundle": "pnpm clean && esbuild --bundle --outfile=./dist/main.js --platform=node --target=node20 --minify --sourcemap ./src/main.ts",
     "zip": "zip -j lambda.zip dist/main.js",
     "aws:update": "aws lambda update-function-code --zip-file file://lambda.zip --function-name hello",
-    "aws:deploy": "run-s build:prod zip aws:update",
+    "aws:deploy": "run-s build:bundle zip aws:update",
     "serverless:dev": "serverless dev",
     "serverless:deploy": "serverless deploy",
     "serverless:remove": "serverless remove --force --all",
-    "start": "pnpm build:prod && serverless offline"
+    "start": "pnpm build:bundle && serverless offline"
   },
   "dependencies": {
     "@jabba01/lfcr-common": "workspace:*",
@@ -39,6 +39,8 @@
     "hono": "^4.7.11"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/lib-config-typescript": "workspace:*",
     "@types/aws-lambda": "^8.10.149"
   }
 }
