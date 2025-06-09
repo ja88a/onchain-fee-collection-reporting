@@ -8,49 +8,42 @@ networks:
     driver: bridge
 
 services:
-  # # FeeCollector Reporter API service
-  # lfcr-report:
-  #   container_name: lfcr-report
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile
-  #     target: fees-reporter
-  #   image: lfcr-report
-  #   depends_on:
-  #     - lfcr-cache
-  #     - lfcr-db
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     NODE_ENV: production
-  #     LOG_LEVEL: info # warn
-  #     OPENAPI_PUBLISH: true
-  #     MONGODB_PROTOCOL: mongodb
-  #     MONGODB_HOST: lfcr-db
-  #     MONGODB_PORT: 27017
-  #     MONGODB_DEFAULT_DATABASE: lfcr
-  #     REDIS_ENDPOINT: 'lfcr-cache:6379'
-  #     REDIS_PASSWORD: 'hSy2TiQFw8Yyzs4oxqjzwvoM'
-  #   links:
-  #     - lfcr-cache
-  #     - lfcr-db
-  #   volumes:
-  #     - lfcr_data:/lfcr/data:rw
-  #   networks:
-  #     - lfcr-network
-
-  # # KV Cache
-  # lfcr-cache:
-  #   container_name: lfcr-cache
-  #   image: redis:7.2.3-alpine3.18
-  #   restart: unless-stopped
-  #   ports:
-  #     - '6379:6379'
-  #   command: redis-server --save 20 1 --loglevel warning --requirepass hSy2TiQFw8Yyzs4oxqjzwvoM
-  #   volumes: 
-  #     - db_data:/lfcr/cache:rw
-  #   networks:
-  #     - lfcr-network
+  # FeeCollector Reporter API service
+  lfcr-api:
+    container_name: fees-reporter-api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: lfcr-server-prod
+      args:
+        - DOCKER_IMG_NAME=fees-reporter-api
+        - DOCKER_IMG_TAG=latest
+        - API_PORT=3000
+        - PROJECT_PACKAGE=@jabba01/lfcr-fees-reporter-api
+        - PROJECT_PATH=packages/fees-reporter-api
+    image: fees-reporter-api
+    depends_on:
+      - lfcr-db
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      MONGODB_HOST: lfcr-db
+      MONGODB_PORT: 27017
+      MONGODB_DATABASE: fee-collection-reporting
+      CHAIN_SCAN_BLOCKS_BATCH_SIZE: 10000
+      CHAIN_LATEST_BLOCK_TAG: finalized
+      CHAIN_QUERY_FAIL_RETRY_NB: 2
+      CHAIN_POLYGON_RPC_URL: https://polygon-rpc.com
+      CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT: 0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9
+      CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START: 70000000
+    links:
+      - lfcr-db
+    volumes:
+      - lfcr_data:/lfcr/data:rw
+    networks:
+      - lfcr-network
 
   # Database
   lfcr-db:
@@ -59,15 +52,15 @@ services:
     ports:
       - '27017:27017'
     environment:
-      - MONGO_INITDB_DATABASE=lfcr
+      - MONGO_INITDB_DATABASE=test
     command: mongod --setParameter maxTransactionLockRequestTimeoutMillis=5000 --setParameter maxTransactionLockRequestTimeoutMillis=5000 --wiredTigerCacheSizeGB=1
     volumes:
       - db_data:/lfcr/db:rw
     networks:
       - lfcr-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/lfcr --quiet
-      interval: 10s
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
