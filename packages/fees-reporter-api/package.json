@@ -1,0 +1,48 @@
+{
+  "name": "@jabba01/lfcr-fees-reporter-api",
+  "version": "0.1.0",
+  "description": "The backend exposing a REST API for reporting fees collected onchain by the LI.FI protocol",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/onchain-fee-collection-reporting",
+    "type": "git"
+  },
+  "keywords": [],
+  "license": "AGPL-3.0-only",
+  "main": "dist/serve",
+  "scripts": {
+    "clean": "shx rm -rf dist/*",
+    "reset": "shx rm -rf dist node_modules .turbo",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "dev": "tsx watch src/serve.ts",
+    "build": "tsc",
+    "start": "dotenv -e ../../.env -- node dist/serve",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.4",
+    "@hono/zod-openapi": "^0.18.4",
+    "@jabba01/lfcr-common": "workspace:*",
+    "@jabba01/lfcr-database": "workspace:*",
+    "@jabba01/lfcr-fees-reporter": "workspace:*",
+    "@jabba01/lfcr-events-scraper": "workspace:*",
+    "hono": "^4.7.11",
+    "hono-openapi": "^0.4.8",
+    "viem": "^2.31.0",
+    "zod": "^3.25.56",
+    "zod-openapi": "^4.2.4"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/lib-config-typescript": "workspace:*",
+    "openapi-typescript": "^7.8.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

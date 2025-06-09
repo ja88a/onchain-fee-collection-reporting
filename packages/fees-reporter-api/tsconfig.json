@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@repo/lib-config-typescript/nest.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "strict": true,
+    "verbatimModuleSyntax": false,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "outDir": "./dist"
+  },
+  "include": [
+    "src",
+    "test"
+  ],
+  "exclude": ["node_modules"]
+}
