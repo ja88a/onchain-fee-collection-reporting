@@ -1,0 +1,62 @@
+{
+  "name": "@jabba01/lfcr-fees-reporter",
+  "version": "0.2.0",
+  "description": "LiFi onchain fees collection reporting service",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/onchain-fee-collection-reporting",
+    "type": "git"
+  },
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "main": "dist/index.js",
+  "files":[
+    "/dist"
+  ],
+  "scripts": {
+    "clean": "shx rm -rf dist/*",
+    "reset": "shx rm -rf dist node_modules .turbo",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "npm:lock": "npm i --package-lock-only true",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "dependencies": {
+    "@jabba01/lfcr-common": "workspace:^",
+    "@jabba01/lfcr-database": "workspace:^",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "ethers": "^5.8.0",
+    "reflect-metadata": "^0.2.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/lib-config-typescript": "workspace:*"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
