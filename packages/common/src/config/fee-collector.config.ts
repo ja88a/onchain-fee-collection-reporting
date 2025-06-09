@@ -21,6 +21,21 @@ export const CHAIN_QUERY_FAIL_RETRY_NB = process.env.CHAIN_QUERY_FAIL_RETRY_NB
   ? parseInt(process.env.CHAIN_QUERY_FAIL_RETRY_NB)
   : 2
 
+/** Default RPC URL for the Polygon Mainnet */
+export const CHAIN_POLYGON_RPC_URL =
+  process.env.CHAIN_POLYGON_RPC_URL || 'https://polygon-rpc.com'
+
+/** Default FeeCollector contract address for the Polygon Mainnet */
+export const CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT =
+  process.env.CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT ||
+  '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9'
+
+/** Default block number from which the FeeCollector contract starts collecting fees on Polygon Mainnet */
+export const CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START =
+  process.env.CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START
+  ? parseInt(process.env.CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START)
+  : 70000000
+
 /** Map of FeeCollector scraping config for the supported blockchains */
 export const feeCollectorChainConfigDefault: Map<string, FeeCollectionScrapingConfig> =
   new Map([
@@ -33,12 +48,12 @@ export const feeCollectorChainConfigDefault: Map<string, FeeCollectionScrapingCo
         chain: {
           id: ChainId.POL,
           type: ChainType.EVM,
-          rpcUrl: 'https://polygon-rpc.com',
+          rpcUrl: CHAIN_POLYGON_RPC_URL,
           lastBlockTag: EBlockTagLatest.default,
         },
         feeCollector: {
-          contract: '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9',
-          blockStart: 47961368,
+          contract: CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT,
+          blockStart: CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START,
         },
       },
     ],

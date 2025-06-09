@@ -30,7 +30,7 @@ const winstonConfigProd: LoggerOptions = {
     format.errors({ stack: true }),
     format.json()
   ),
-  defaultMeta: { service: 'lifi-fcr' },
+  defaultMeta: { service: 'lifi-fc-report' },
   transports: [
     // Console JSON output
     new transports.Console({
@@ -61,7 +61,7 @@ const winstonConfigDev: LoggerOptions = {
       format: format.combine(
         format.colorize(),
         format.printf(({ timestamp, level, message, label, ...rest }) => {
-          return `${timestamp} ${level} [${label || 'app'}]: ${message} ${
+          return `${timestamp} ${level} [${label || 'lfcr-app'}]: ${message} ${
             Object.keys(rest).length ? JSON.stringify(rest) : ''
           }`
         })
@@ -79,12 +79,3 @@ const winstonConfigDev: LoggerOptions = {
  * must be set to `production` to output logs in a one line JSON format.
  */
 export const logger = createLogger(IS_NODE_PROD ? winstonConfigProd : winstonConfigDev)
-
-// // Temporary console logger implementation
-// export const logger = {
-//   debug: (message: string) => console.debug(`DEBUG - ${message}`),
-//   info: (message: string) => console.info(`INFO  - ${message}`),
-//   warn: (message: string) => console.warn(`WARN  - ${message}`),
-//   error: (message: string) => console.error(`ERROR - ${message}`),
-//   child: (_options?: { label?: string }) => logger,
-// }
