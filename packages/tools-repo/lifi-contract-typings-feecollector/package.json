@@ -20,8 +20,8 @@
   "scripts": {
     "clean": "shx rm -rf dist/*",
     "reset": "shx rm -rf dist node_modules .turbo",
-    "build": "esbuild --bundle --outfile=./dist/FeeCollector.js --platform=node --target=node20 --minify --sourcemap ../../lib/lifi-contract-types/src/factories/FeeCollector__factory.ts",
-    "bundle:lifi-contract-typings": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ../../lib/lifi-contract-types/src/index.ts"
+    "build": "esbuild --bundle --outfile=./dist/FeeCollector.js --platform=node --target=node20 --minify --sourcemap ../../../lib/lifi-contract-types/src/factories/FeeCollector__factory.ts",
+    "bundle:lifi-contract-typings": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ../../../lib/lifi-contract-types/src/index.ts"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.8.0",

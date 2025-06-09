@@ -11,11 +11,11 @@ import {
   FeeCollectionScrapingConfig,
 } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
-import { FeeCollectionConfigStore, FeeCollectedEventStore } from '@jabba01/lfcr-database'
+import { FeeCollectedEventStore, FeeCollectionConfigStore } from '@jabba01/lfcr-database'
+import { FeeCollector__factory } from '@jabba01/lfcr-lifi-contract-typings-feecollector/dist/FeeCollector'
 import { ChainKey } from '@lifi/types'
 import { BigNumber, ethers } from 'ethers'
 import { ResultEventScrapingSession } from './dto/event-scraping-result.dto'
-import { FeeCollector__factory } from '../../lifi-contract-typings-feecollector/dist/FeeCollector'
 
 /**
  * Service for scraping LI.FI FeeCollector contracts' events.
