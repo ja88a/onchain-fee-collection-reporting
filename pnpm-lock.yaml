@@ -169,7 +169,7 @@ importers:
         version: link:../database
       '@jabba01/lfcr-lifi-contract-typings-feecollector':
         specifier: workspace:*
-        version: link:../lifi-contract-typings-feecollector
+        version: link:../tools-repo/lifi-contract-typings-feecollector
       '@lifi/types':
         specifier: ^17.17.0
         version: 17.17.0(typescript@5.8.3)
@@ -286,25 +286,6 @@ importers:
         specifier: ^7.8.0
         version: 7.8.0(typescript@5.8.3)
 
-  packages/lifi-contract-typings-feecollector:
-    dependencies:
-      '@ethersproject/abi':
-        specifier: ^5.8.0
-        version: 5.8.0
-      '@ethersproject/bytes':
-        specifier: ^5.8.0
-        version: 5.8.0
-      '@ethersproject/providers':
-        specifier: ^5.8.0
-        version: 5.8.0
-      ethers:
-        specifier: ^5.8.0
-        version: 5.8.0
-    devDependencies:
-      lifi-contract-typings:
-        specifier: workspace:*
-        version: link:../../lib/lifi-contract-types
-
   packages/tools-repo/lib-config-eslint:
     devDependencies:
       '@eslint/js':
@@ -333,6 +314,25 @@ importers:
         version: 8.33.1(eslint@9.28.0(jiti@2.4.2))(typescript@5.8.3)
 
   packages/tools-repo/lib-config-typescript: {}
+
+  packages/tools-repo/lifi-contract-typings-feecollector:
+    dependencies:
+      '@ethersproject/abi':
+        specifier: ^5.8.0
+        version: 5.8.0
+      '@ethersproject/bytes':
+        specifier: ^5.8.0
+        version: 5.8.0
+      '@ethersproject/providers':
+        specifier: ^5.8.0
+        version: 5.8.0
+      ethers:
+        specifier: ^5.8.0
+        version: 5.8.0
+    devDependencies:
+      lifi-contract-typings:
+        specifier: workspace:*
+        version: link:../../../lib/lifi-contract-types
 
 packages:
 
