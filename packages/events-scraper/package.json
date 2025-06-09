@@ -14,6 +14,9 @@
   "private": true,
   "license": "AGPL-3.0-only",
   "main": "dist/index",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "check-types": "tsc --noEmit",
     "clean": "shx rm -rf dist/* artifacts/*",
@@ -22,8 +25,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "vitest run",
     "build": "tsc",
-    "build:prod": "pnpm clean && esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ./src/index.ts",
-    "start": "pnpm build && DEV_MODE=1 NODE_ENV=dev node dist/main"
+    "build:bundle": "pnpm clean && esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ./src/index.ts",
+    "start": "pnpm build && dotenv -e ../../.env -- node dist/main"
   },
   "dependencies": {
     "@ethersproject/abstract-provider": "^5.8.0",
@@ -34,5 +37,7 @@
     "@jabba01/lfcr-lifi-contract-typings-feecollector": "workspace:*"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/lib-config-typescript": "workspace:*"
   }
 }

@@ -2,7 +2,12 @@ import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { ChainKey } from '@lifi/types'
 import { FeeCollectionEventScraper } from './events-scraper.service'
 import { ResultEventScrapingSession } from './dto'
-import { EventScrapingError, EventScrapingInvalidInputError } from './utils'
+import {
+  EventScrapingDatabaseError,
+  EventScrapingError,
+  EventScrapingInputError,
+} from './utils'
+import { DatabaseConnector } from '@jabba01/lfcr-database'
 
 /** Private logger */
 const logger = wLogger.child({
@@ -15,10 +20,12 @@ const logger = wLogger.child({
  * @param requestId the request ID
  * @returns an http-based response status and body message
  */
-export const startScraping = async (chain: string): Promise<ResultEventScrapingSession> => {
+export const startScraping = async (
+  chain: string
+): Promise<ResultEventScrapingSession> => {
   // Validate the input chain key
   if (!Object.values(ChainKey).includes(<ChainKey>chain)) {
-    throw new EventScrapingInvalidInputError(
+    throw new EventScrapingInputError(
       `Invalid chain key '${chain}' submitted - Events Scraping session aborted`
     )
   }
@@ -27,15 +34,25 @@ export const startScraping = async (chain: string): Promise<ResultEventScrapingS
   const appService = new FeeCollectionEventScraper()
   const chainKey = <ChainKey>chain
 
-  // Scrap latest FeeCollector events for the specified chain
-  const res = await appService.scrapFeeCollectorEvents(chainKey).catch((error: any) => {
-    const msgGenericMsg = `Failed to scrap FeeCollector events from chain '${chainKey}'`
-    logger.error(
-      `${msgGenericMsg} - Events Scraping ABORTED. \n${error.stack ?? error}`
-    )
-    throw new EventScrapingError(msgGenericMsg, error)
-  })
-
-  return res
+  return DatabaseConnector.init()
+    .catch((error) => {
+      throw new EventScrapingDatabaseError(
+        `Failed to init database connection.`,
+        500,
+        { cause: error }
+      )
+    })
+    .then(async () => {
+      // Scrap latest FeeCollector events for the specified chain
+      return await appService.scrapFeeCollectorEvents(chainKey).catch((error: any) => {
+        const msgGenericMsg = `Failed to scrap FeeCollector events from chain '${chainKey}'`
+        logger.error(
+          `${msgGenericMsg} - Events Scraping ABORTED. \n${error.stack ?? error}`
+        )
+        throw new EventScrapingError(msgGenericMsg, 500, { cause: error })
+      })
+    })
+    .finally(() => {
+      DatabaseConnector.close()
+    })
 }
-

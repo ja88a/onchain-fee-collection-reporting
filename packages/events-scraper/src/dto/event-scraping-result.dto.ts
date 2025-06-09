@@ -8,6 +8,6 @@ export type ResultEventScrapingSession = {
   /** Number of new onchain events collected */
   eventsNew: number
 
-  /** User friendly sumup message */
+  /** Sum-up message */
   message: string
 }

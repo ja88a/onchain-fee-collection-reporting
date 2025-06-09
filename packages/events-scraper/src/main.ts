@@ -27,6 +27,7 @@ DatabaseConnector.init()
       })
   })
   .finally(() => {
+    DatabaseConnector.close()
     const duration = new Date().getTime() - startTime.getTime()
     logger.info(`Process duration: ${duration / 1000}s`)
     process.exit()
