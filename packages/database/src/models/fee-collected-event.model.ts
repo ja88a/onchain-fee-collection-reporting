@@ -53,8 +53,8 @@ export class FeeCollectionEventDoc extends TimeStamps {
   public lifiFee!: string
 }
 
-/** 
- * Get the doc model of the LI.FI fee collection events 
+/**
+ * Get the doc model of the LI.FI fee collection events
  */
 export const getFeeCollectionEventModel = () => {
   // Only get the model when the connection is established

@@ -7,7 +7,10 @@ import { ChainKey, ChainType } from '@lifi/types'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import { Document, Types } from 'mongoose'
 import { DbError } from '../database.utils'
-import { getFeeCollectionScrapingConfigModel, FeeCollectionScrapingConfigDoc } from '../models'
+import {
+  getFeeCollectionScrapingConfigModel,
+  FeeCollectionScrapingConfigDoc,
+} from '../models'
 
 /**
  * Service for storing and retrieving onchain-related scraping information data about FeeCollector events
@@ -19,8 +22,7 @@ export class FeeCollectionConfigStore {
   })
 
   /** Mongoose model for FeeCollector event scraping configuration */
-  private readonly FeeCollectionOnchainConfigModel =
-    getFeeCollectionScrapingConfigModel()
+  private readonly FeeCollectionOnchainConfigModel = getFeeCollectionScrapingConfigModel()
 
   /**
    * Create a new EventScrapingInfo document in the database

@@ -36,11 +36,11 @@ export class FeeCollectedEventStore {
     const dbEntries = feeCollectedEvents.map((feeCollectedEvent) => {
       return this.convertToDoc(feeCollectedEvent)
     })
-    return await this.FeeCollectionEventModel.insertMany(dbEntries, { ordered: false }).catch(
-      (err) => {
-        this.logger.warn(`Attempted to insert already stored events. \n${err}`)
-      }
-    )
+    return await this.FeeCollectionEventModel.insertMany(dbEntries, {
+      ordered: false,
+    }).catch((err) => {
+      this.logger.warn(`Attempted to insert already stored events. \n${err}`)
+    })
   }
 
   /**
@@ -75,7 +75,7 @@ export class FeeCollectedEventStore {
   }
 
   /** Mapping utility method: Convert a stored doc into an external data model instance */
-  private convertToEntity(doc): FeeCollectedEventParsed {
+  private convertToEntity(doc: any): FeeCollectedEventParsed {
     return {
       docId: doc.id,
       chainKey: doc.chainKey,

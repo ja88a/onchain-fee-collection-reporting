@@ -14,12 +14,14 @@
   "keywords": [],
   "license": "AGPL-3.0-only",
   "main": "dist/index",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "clean": "shx rm -rf dist/* && rm -rf coverage/*",
     "reset": "shx rm -rf dist node_modules .turbo coverage",
     "build": "tsc",
-    "build:prod": "pnpm clean && tsc -p tsconfig.build.json",
-    "build:webpack": "webpack --config webpack.config.js",
+    "build:bundle": "pnpm clean && esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ./src/index.ts",
     "watch": "tsc -w",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -30,11 +32,13 @@
   "dependencies": {
     "@jabba01/lfcr-common": "workspace:*",
     "@lifi/types": "^17.17.0",
+    "@typegoose/typegoose": "^12.16.0",
     "ethers": "^5.8.0",
-    "@typegoose/typegoose": "^12.2.0",
     "mongoose": "^8.15.1"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/lib-config-typescript": "workspace:*"
   },
   "jest": {
     "moduleFileExtensions": [
