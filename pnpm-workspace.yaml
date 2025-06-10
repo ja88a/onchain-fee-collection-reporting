@@ -4,3 +4,4 @@ packages:
   - test-e2e
 onlyBuiltDependencies:
   - aws-sdk
+  - mongodb-memory-server

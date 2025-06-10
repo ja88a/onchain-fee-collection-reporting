@@ -7,9 +7,6 @@
 # Turbo
 **/.turbo
 
-# Serverless states
-**/.serverless
-
 # Logs
 **/logs
 **/*.log

@@ -49,6 +49,9 @@
     "clean": {
       "cache": false
     },
+    "reset": {
+      "cache": false
+    },
     "test": {
       "dependsOn": [
         "^test"
