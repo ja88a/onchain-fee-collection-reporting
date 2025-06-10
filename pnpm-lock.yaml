@@ -116,7 +116,7 @@ importers:
     dependencies:
       '@lifi/types':
         specifier: ^17.17.0
-        version: 17.17.0(typescript@5.8.3)
+        version: 17.17.0(typescript@5.8.3)(zod@3.25.56)
       ethers:
         specifier: ^5.8.0
         version: 5.8.0
@@ -138,7 +138,7 @@ importers:
         version: link:../common
       '@lifi/types':
         specifier: ^17.17.0
-        version: 17.17.0(typescript@5.8.3)
+        version: 17.17.0(typescript@5.8.3)(zod@3.25.56)
       '@typegoose/typegoose':
         specifier: ^12.16.0
         version: 12.16.0(mongoose@8.15.1)
@@ -172,7 +172,7 @@ importers:
         version: link:../tools-repo/lifi-contract-typings-feecollector
       '@lifi/types':
         specifier: ^17.17.0
-        version: 17.17.0(typescript@5.8.3)
+        version: 17.17.0(typescript@5.8.3)(zod@3.25.56)
       ethers:
         specifier: ^5.8.0
         version: 5.8.0
@@ -220,6 +220,9 @@ importers:
       '@jabba01/lfcr-database':
         specifier: workspace:^
         version: link:../database
+      '@lifi/types':
+        specifier: ^17.18.0
+        version: 17.18.0(typescript@5.8.3)(zod@3.25.56)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -260,6 +263,9 @@ importers:
       '@jabba01/lfcr-fees-reporter':
         specifier: workspace:*
         version: link:../fees-reporter
+      '@lifi/types':
+        specifier: ^17.17.0
+        version: 17.17.0(typescript@5.8.3)(zod@3.25.56)
       hono:
         specifier: ^4.7.11
         version: 4.7.11
@@ -1306,6 +1312,9 @@ packages:
 
   '@lifi/types@17.17.0':
     resolution: {integrity: sha512-PyR56UZJjmq3CkUlX6+m92j/DL3hJDFioKP7UKKkLGn+lYCCIdEhD4J88YKIikEeWoGcZ86bhAEEDyDS3sJ/Ug==}
+
+  '@lifi/types@17.18.0':
+    resolution: {integrity: sha512-rDHJZ3dwSdG/ZK/CKjfPs3SvCnADLPNNbDtWo1BXMtUY4wdO9ZjoxlpoHj4zzu/LPWVejUf7j4hiNOE43rFd5A==}
 
   '@mongodb-js/saslprep@1.2.2':
     resolution: {integrity: sha512-EB0O3SCSNRUFk66iRCpI+cXzIjdswfCs7F6nOC3RAGJ7xr5YhaicvsRwJ9eyzYvYRlCSDUO/c7g4yNulxKC1WA==}
@@ -5963,7 +5972,16 @@ snapshots:
     dependencies:
       jsep: 1.4.0
 
-  '@lifi/types@17.17.0(typescript@5.8.3)':
+  '@lifi/types@17.17.0(typescript@5.8.3)(zod@3.25.56)':
+    dependencies:
+      viem: 2.31.0(typescript@5.8.3)(zod@3.25.56)
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@lifi/types@17.18.0(typescript@5.8.3)(zod@3.25.56)':
     dependencies:
       viem: 2.31.0(typescript@5.8.3)(zod@3.25.56)
     transitivePeerDependencies:

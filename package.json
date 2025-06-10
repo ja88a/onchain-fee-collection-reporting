@@ -34,6 +34,7 @@
     "docker:up:rebuild": "pnpm i && dotenv -e ./.env -- docker compose up --force-recreate --build --remove-orphans",
     "docker:stop": "docker compose stop",
     "docker:down": "docker compose down",
+    "docker:db:start": "docker compose up -d lfcr-db",
     "start": "turbo start --log-order stream",
     "test": "turbo test",
     "reset": "turbo reset && shx rm -rf node_modules .turbo .serverless",
