@@ -12,7 +12,7 @@ export type FeeCollectedEventParsed = {
   /** Transaction hash in which context the event was emitted */
   txHash: string
 
-  /** Block number when the event was emitted */
+  /** Block number, or chain specific tag, when the event was emitted */
   blockTag: number | string
 
   /** Address of the token that was collected */

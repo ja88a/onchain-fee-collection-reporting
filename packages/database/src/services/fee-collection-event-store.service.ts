@@ -44,16 +44,35 @@ export class FeeCollectedEventStore {
   }
 
   /**
-   * Retrieve the FeeCollected events for a given integrator
+   * Retrieve the FeeCollected events for a given integrator.
+   * 
+   * Retrieval can be paginated by providing a limit and an offset.
+   * If no limit is provided, or is not a positive number, all events for the integrator will be returned.
+   *
+   * Default sort order is descending by blockTag.
+   * 
    * @param integratorId Unique ID, hex address, of the integrator
+   * @param limit the maximum number of events to retrieve, default is no limit
+   * @param offset the number of events to skip before starting to collect the result set
    * @returns the list of FeeCollected events stored in the database for the given integrator
    */
   async retrieveFeeCollectedEventsByIntegrator(
-    integratorId: string
+    integratorId: string,
+    limit?: number,
+    offset?: number
   ): Promise<FeeCollectedEventParsed[]> {
-    const feeCollectedEvents = await this.FeeCollectionEventModel.find({
-      integrator: integratorId,
-    })
+    const feeCollectedEvents =
+      limit > 0
+        ? await this.FeeCollectionEventModel.find({
+            integrator: integratorId,
+          })
+            .skip(offset || 0)
+            .limit(limit)
+            .sort({ blockTag: 'desc' })
+        : await this.FeeCollectionEventModel.find({
+            integrator: integratorId,
+          }).sort({ blockTag: 'desc' })
+
     return feeCollectedEvents.map((feeCollectedEvent) => {
       return this.convertToEntity(feeCollectedEvent)
     })
@@ -69,8 +88,8 @@ export class FeeCollectedEventStore {
       blockTag: feeCollectedEvent.blockTag,
       token: feeCollectedEvent.token,
       integrator: feeCollectedEvent.integrator,
-      integratorFee: feeCollectedEvent.integratorFee.toHexString(),
-      lifiFee: feeCollectedEvent.lifiFee.toHexString(),
+      integratorFee: feeCollectedEvent.integratorFee.toString(),
+      lifiFee: feeCollectedEvent.lifiFee.toString(),
     }
   }
 
