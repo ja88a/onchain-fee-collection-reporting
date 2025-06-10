@@ -8,7 +8,7 @@ import { DbError } from '../database.utils'
 /**
  * Configuration settings for the target blockchain to scan
  */
-class ChainProperties {
+class ChainPropertiesDoc {
   /** Target blockchain ID, based on LI.FI data types */
   @prop()
   public id!: number
@@ -29,7 +29,7 @@ class ChainProperties {
 /**
  * LiFi FeeCollector contract properties for its onchain scanning.
  */
-class FeeCollectorProperties {
+class FeeCollectorPropertiesDoc {
   /** the onchain address of the LI.FI FeeCollector contract */
   @prop({ required: true })
   public contract!: string
@@ -65,11 +65,11 @@ export class FeeCollectionScrapingConfigDoc extends TimeStamps {
 
   /** the blockchain info */
   @prop({ required: true })
-  public chain!: ChainProperties
+  public chain!: ChainPropertiesDoc
 
   /** the FeeCollector contract info */
   @prop({ required: true })
-  public feeCollector!: FeeCollectorProperties
+  public feeCollector!: FeeCollectorPropertiesDoc
 
   /** General status for scraping events on the chain */
   @prop()

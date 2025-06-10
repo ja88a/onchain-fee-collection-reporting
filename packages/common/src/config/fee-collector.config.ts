@@ -31,8 +31,8 @@ export const CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT =
   '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9'
 
 /** Default block number from which the FeeCollector contract starts collecting fees on Polygon Mainnet */
-export const CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START =
-  process.env.CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START
+export const CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START = process.env
+  .CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START
   ? parseInt(process.env.CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START)
   : 70000000
 

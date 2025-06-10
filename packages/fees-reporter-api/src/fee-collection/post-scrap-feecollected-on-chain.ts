@@ -33,19 +33,21 @@ export function postScrapFeesCollectedOnChain<E extends Env, TTag extends ITag>(
           content: {
             'application/json': {
               schema: resolver(
-                z.object({
-                  blocksScanned: z.number().openapi({
-                    description: 'Number of blocks scanned'
-                  }),
-                  eventsNew: z.number().openapi({
-                    description: 'Number of new onchain events collected'
-                  }),
-                  message: z.string().openapi({
-                    description: 'Textual sum-up of the scraping session'
-                  }),
-                }).openapi({
-                  description: 'Result of an events scraping session'
-                })
+                z
+                  .object({
+                    blocksScanned: z.number().openapi({
+                      description: 'Number of blocks scanned',
+                    }),
+                    eventsNew: z.number().openapi({
+                      description: 'Number of new onchain events collected',
+                    }),
+                    message: z.string().openapi({
+                      description: 'Textual sum-up of the scraping session',
+                    }),
+                  })
+                  .openapi({
+                    description: 'Result of an events scraping session',
+                  })
               ),
             },
           },

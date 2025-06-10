@@ -80,7 +80,7 @@ export const reportFeesCollectedByIntegrator = async (
 export const getFeeCollectionEventsByIntegrator = async (
   integratorAccount: string,
   limit?: number,
-  offset?: number,
+  offset?: number
 ): Promise<FeeCollectedEventDto[]> => {
   logger.info(
     `FeeCollection events requested for integrator '${integratorAccount}' - Limit '${limit}' and page offset '${offset}'`
@@ -116,15 +116,17 @@ export const getFeeCollectionEventsByIntegrator = async (
 
 /**
  * Converts fee collection events from the parsed format to the DTO format.
- * @param feeCollectionEvents 
- * @returns 
+ * @param feeCollectionEvents
+ * @returns
  */
-const convertFeeEventsToDto = (feeCollectionEvents: FeeCollectedEventParsed[]): FeeCollectedEventDto[] => {
+const convertFeeEventsToDto = (
+  feeCollectionEvents: FeeCollectedEventParsed[]
+): FeeCollectedEventDto[] => {
   if (!feeCollectionEvents || feeCollectionEvents.length === 0) {
     return []
   }
   // Convert the fee collection events to DTO format
-  return feeCollectionEvents.map(event => ({
+  return feeCollectionEvents.map((event) => ({
     chainKey: <string>event.chainKey,
     txHash: event.txHash,
     blockTag: event.blockTag + '', // Ensure blockTag is a string

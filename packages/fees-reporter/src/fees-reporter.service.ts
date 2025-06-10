@@ -26,10 +26,9 @@ export class FeeCollectedReportService {
   async reportFeesCollectedByIntegrator(
     integratorId: string
   ): Promise<IntegratorFeesCollectedReport> {
-    const integratorFeeCollectedEvents =
-      await this.feeCollectedEventPersistence.retrieveFeeCollectedEventsByIntegrator(
-        integratorId
-      ).catch((error) => {
+    const integratorFeeCollectedEvents = await this.feeCollectedEventPersistence
+      .retrieveFeeCollectedEventsByIntegrator(integratorId)
+      .catch((error) => {
         throw new FeeCollectionReportDatabaseError(
           `Failed to retrieve FeeCollected events for integrator '${integratorId}'.`,
           500,
@@ -99,16 +98,14 @@ export class FeeCollectedReportService {
     pageNumber: number
   ): Promise<FeeCollectedEventParsed[]> {
     const docsOffset = pageNumber * limitNumber
-    return await this.feeCollectedEventPersistence.retrieveFeeCollectedEventsByIntegrator(
-      integratorAccount,
-      limitNumber,
-      docsOffset
-    ).catch((error) => {
-      throw new FeeCollectionReportDatabaseError(
-        `Failed to retrieve FeeCollected events for integrator '${integratorAccount}'. Limit '${limitNumber}' Page '${pageNumber}'.`,
-        500,
-        { cause: error }
-      )
-    })
+    return await this.feeCollectedEventPersistence
+      .retrieveFeeCollectedEventsByIntegrator(integratorAccount, limitNumber, docsOffset)
+      .catch((error) => {
+        throw new FeeCollectionReportDatabaseError(
+          `Failed to retrieve FeeCollected events for integrator '${integratorAccount}'. Limit '${limitNumber}' Page '${pageNumber}'.`,
+          500,
+          { cause: error }
+        )
+      })
   }
 }

@@ -45,7 +45,8 @@ export class FeeCollectionEventScraper {
     const chainConfig = await this.retrieveFeeCollectionConfig(chainKey).catch(
       (error) => {
         throw new Error(
-          `Failed to retrieve the FeeCollector Scraping Config for chain '${chainKey}'\n${error.stack}`
+          `Failed to retrieve the FeeCollector Scraping Config for chain '${chainKey}': ${error.message}`,
+          { cause: error }
         )
       }
     )
@@ -101,7 +102,7 @@ export class FeeCollectionEventScraper {
 
     // Compute the scraping session result
     return {
-      message: `${countCollectedEvents} new FeeCollected Event${countCollectedEvents > 1 ? 's' : ''} scraped ${countCollectedEvents > 0 ? 'successfully ' : ''}from chain '${chainKey}'`,
+      message: `${countCollectedEvents} new FeeCollected events scraped ${countCollectedEvents > 0 ? 'successfully ' : ''}from chain '${chainKey}' over ${chainLastBlockNb - lastScannedBlockNb} blocks scanned`,
       eventsNew: countCollectedEvents,
       blocksScanned: chainLastBlockNb - lastScannedBlockNb,
     }
@@ -174,7 +175,7 @@ export class FeeCollectionEventScraper {
         blockEnd = chainLastBlockNb
       }
 
-      this.logger.debug(
+      this.logger.info(
         `Scanning blocks of '${chainKey}' from ${blockStart} to ${blockEnd} (batch size: ${blockEnd - blockStart + 1})`
       )
 
@@ -229,11 +230,11 @@ export class FeeCollectionEventScraper {
       const feeCollectorChainConfig = feeCollectorChainConfigDefault.get(chainKey)
       if (!feeCollectorChainConfig) {
         throw new Error(
-          `No default configuration found for the FeeCollector scraping on chain '${chainKey}'`
+          `No configuration found for scraping FeeCollector events on chain '${chainKey}'`
         )
       }
       this.logger.debug(
-        `Persisting a default FeeCollector scraping configuration for chain '${chainKey}'`
+        `Persisting a FeeCollector scraping config for chain '${chainKey}'`
       )
       return await this.dbFeeCollectionConfig.createFeeCollectorEventScrapingConfig(
         chainKey,
@@ -241,7 +242,7 @@ export class FeeCollectionEventScraper {
       )
     }
     this.logger.info(
-      `FeeCollector scraping config for chain '${chainKey}' : ${JSON.stringify(storedConfig)}`
+      `FeeCollector scraping config for chain '${chainKey}': ${JSON.stringify(storedConfig)}`
     )
     return storedConfig
   }

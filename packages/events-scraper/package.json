@@ -25,6 +25,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "vitest run",
     "build": "tsc",
+    "build:prod": "tsc -p tsconfig.build.json",
     "build:bundle": "pnpm clean && esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ./src/index.ts",
     "start": "pnpm build && dotenv -e ../../.env -- node dist/main"
   },

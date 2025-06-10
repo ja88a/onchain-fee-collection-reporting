@@ -18,51 +18,70 @@ export function getFeesCollectedByIntegrator<E extends Env, TTag extends ITag>(
       tags: [tag.tag],
       responses: {
         200: {
-          description: 'Retrieve a sum-up report of all token fees collected by an integrator on chains, as well as corresponding LI.FI protocol share.',
+          description:
+            'Retrieve a sum-up report of all token fees collected by an integrator on chains, as well as corresponding LI.FI protocol share.',
           content: {
             'application/json': {
               schema: resolver(
-                z.object({
-                  integrator: z.string().openapi({
-                    description: 'Onchain account address of the integrator',
-                  }),
-                  integratorFeesCollected: z.array(
-                    z.object({
-                      chainKey: z.string().openapi({
-                        description: 'Chain key where the FeeCollector contract is deployed',
-                      }),
-                      token: z.string().openapi({
-                        description: 'Token address of the collected fees',
-                      }),
-                      amount: Int256.openapi({
-                        description: 'Total amount of tokens, a big number expressed in string format',
-                      }),
-                    }).openapi({
-                      description: 'Fees collected by the integrator on a specific chain',
-                    }), 
-                  ).openapi({
-                    description: 'Total fees collected by the integrator per chain and token',
-                  }),
-                  lifiFeesCollected: z.array(
-                    z.object({
-                      chainKey: z.string().openapi({
-                        description: 'Chain key where the LiFi protocol share is collected',
-                      }),
-                      token: z.string().openapi({
-                        description: 'Token address of the LiFi protocol share',
-                      }),
-                      amount: Int256.openapi({
-                        description: 'Total amount of tokens, a big number expressed in string format',
-                      }),
-                    }).openapi({
-                      description: 'LiFi protocol share of the fees collected by the integrator',
+                z
+                  .object({
+                    integrator: z.string().openapi({
+                      description: 'Onchain account address of the integrator',
                     }),
-                  ).openapi({
-                    description: 'LiFi protocol share of the fees collected by the integrator per chain and token',
-                  }),
-                }).openapi({
-                  description: 'Total fees collected by the integrator',
-                }),
+                    integratorFeesCollected: z
+                      .array(
+                        z
+                          .object({
+                            chainKey: z.string().openapi({
+                              description:
+                                'Chain key where the FeeCollector contract is deployed',
+                            }),
+                            token: z.string().openapi({
+                              description: 'Token address of the collected fees',
+                            }),
+                            amount: Int256.openapi({
+                              description:
+                                'Total amount of tokens, a big number expressed in string format',
+                            }),
+                          })
+                          .openapi({
+                            description:
+                              'Fees collected by the integrator on a specific chain',
+                          })
+                      )
+                      .openapi({
+                        description:
+                          'Total fees collected by the integrator per chain and token',
+                      }),
+                    lifiFeesCollected: z
+                      .array(
+                        z
+                          .object({
+                            chainKey: z.string().openapi({
+                              description:
+                                'Chain key where the LiFi protocol share is collected',
+                            }),
+                            token: z.string().openapi({
+                              description: 'Token address of the LiFi protocol share',
+                            }),
+                            amount: Int256.openapi({
+                              description:
+                                'Total amount of tokens, a big number expressed in string format',
+                            }),
+                          })
+                          .openapi({
+                            description:
+                              'LiFi protocol share of the fees collected by the integrator',
+                          })
+                      )
+                      .openapi({
+                        description:
+                          'LiFi protocol share of the fees collected by the integrator per chain and token',
+                      }),
+                  })
+                  .openapi({
+                    description: 'Total fees collected by the integrator',
+                  })
               ),
             },
           },
@@ -78,9 +97,7 @@ export function getFeesCollectedByIntegrator<E extends Env, TTag extends ITag>(
     async (c) => {
       const { integrator } = c.req.valid('param')
       const report = await reportFeesCollectedByIntegrator(<string>integrator)
-      return c.json(report,
-        200
-      )
+      return c.json(report, 200)
     }
   )
 }

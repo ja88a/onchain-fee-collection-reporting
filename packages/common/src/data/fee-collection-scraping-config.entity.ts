@@ -1,4 +1,4 @@
-import { ChainKey, ChainType, ChainId } from '@lifi/types'
+import { ChainKey } from '@lifi/types'
 
 /** Supported statuses for the scraping of events on a blockchain */
 export const enum EEventScrapingStatus {
@@ -20,6 +20,41 @@ export const enum EBlockTagLatest {
   default = FINALIZED,
 }
 
+/**
+ * Configuration settings for the target blockchain to scan
+ */
+export type ChainProperties = {
+  /** Target blockchain ID, based on LI.FI data types */
+  id: number
+
+  /** Chain type, e.g. `EVM`, based on LI.FI data types */
+  type: string
+
+  /** URL of the JSON RPC provider */
+  rpcUrl: string
+
+  /** the chain specific tag enabling to get its last block number.
+   * The tag to use for retrieving a chain [safe | finalized] last block. */
+  lastBlockTag: string | number
+}
+
+/**
+ * LiFi FeeCollector contract properties for its onchain scanning.
+ */
+export type FeeCollectorProperties = {
+  /** the onchain address of the LI.FI FeeCollector contract */
+  contract: string
+
+  /** the block number from which to start seeking for FeeCollected events */
+  blockStart: number
+
+  /** the number of last scanned block while seeking for onchain events */
+  lastScanBlock?: number
+
+  /** Last time a scan of block events was performed, epoch in ms */
+  lastScanTime?: number
+}
+
 /** Configuration of onchain LiFi FeeCollector contracts */
 export type FeeCollectionScrapingConfig = {
   /** the unique target blockchain key, based on LI.FI data types */
@@ -29,34 +64,10 @@ export type FeeCollectionScrapingConfig = {
   status: EEventScrapingStatus
 
   /** Blockchain info */
-  chain: {
-    /** LI.FI blockchain ID */
-    id: ChainId
-
-    /** LI.FI blockchain type */
-    type: ChainType
-
-    /** URL of the default JSON RPC provider */
-    rpcUrl: string
-
-    /** The tag to use for retrieving a chain [safe | finalized] last block */
-    lastBlockTag: number | string
-  }
+  chain: ChainProperties
 
   /** FeeCollector onchain related info */
-  feeCollector: {
-    /** LI.FI FeeCollector contract address, an hexa string */
-    contract: string
-
-    /** The block number to consider for starting a new blockchain scan session of FeeCollector events */
-    blockStart: number
-
-    /** Last scanned block number during last scraping session of FeeCollected events */
-    lastScanBlock?: number
-
-    /** Last time a scraping session of FeeCollected events was performed */
-    lastScanTime?: number
-  }
+  feeCollector: FeeCollectorProperties
 
   /** DB document identifier */
   docId?: string

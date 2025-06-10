@@ -45,12 +45,12 @@ export class FeeCollectedEventStore {
 
   /**
    * Retrieve the FeeCollected events for a given integrator.
-   * 
+   *
    * Retrieval can be paginated by providing a limit and an offset.
    * If no limit is provided, or is not a positive number, all events for the integrator will be returned.
    *
    * Default sort order is descending by blockTag.
-   * 
+   *
    * @param integratorId Unique ID, hex address, of the integrator
    * @param limit the maximum number of events to retrieve, default is no limit
    * @param offset the number of events to skip before starting to collect the result set

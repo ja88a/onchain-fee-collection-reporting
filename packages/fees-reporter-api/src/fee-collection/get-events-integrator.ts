@@ -4,9 +4,7 @@ import { resolver, validator } from 'hono-openapi/zod'
 import { Factory } from 'hono/factory'
 import { z } from 'zod'
 import { AddressSchemaSpec, ITag } from '../common'
-import {
-  getFeeCollectionEventsByIntegrator,
-} from '@jabba01/lfcr-fees-reporter'
+import { getFeeCollectionEventsByIntegrator } from '@jabba01/lfcr-fees-reporter'
 
 export function getFeesCollectedEventsByIntegrator<E extends Env, TTag extends ITag>(
   factory: Factory<E>,
@@ -30,40 +28,29 @@ export function getFeesCollectedEventsByIntegrator<E extends Env, TTag extends I
                     chainKey: z.string().openapi({
                       description: 'Chain where the fees were collected',
                     }),
-                    txHash: z
-                      .string()
-                      .openapi({
-                        description:
-                          'Transaction hash of the fee collection event',
-                      }),
-                    blockTag: z
-                      .string()
-                      .openapi({
-                        description:
-                          'Block tag where the fee collection event was emitted',
-                      }),
-                    token: z
-                      .string()
-                      .openapi({
-                        description: 'Token address of the collected fee',
-                      }),
-                    integrator: z
-                      .string()
-                      .openapi({
-                        description: 'Account address/id of the integrator',
-                      }),
+                    txHash: z.string().openapi({
+                      description: 'Transaction hash of the fee collection event',
+                    }),
+                    blockTag: z.string().openapi({
+                      description: 'Block tag where the fee collection event was emitted',
+                    }),
+                    token: z.string().openapi({
+                      description: 'Token address of the collected fee',
+                    }),
+                    integrator: z.string().openapi({
+                      description: 'Account address/id of the integrator',
+                    }),
                     integratorFee: z.string().openapi({
-                      description: 'Amount of fees collected by the integrator, expressed in the token unit',
+                      description:
+                        'Amount of fees collected by the integrator, expressed in the token unit',
                     }),
                     lifiFee: z.string().openapi({
-                      description: 'Amount of fees collected by the LI.FI protocol, expressed in the token unit',
+                      description:
+                        'Amount of fees collected by the LI.FI protocol, expressed in the token unit',
                     }),
-                    docId: z
-                      .string()
-                      .optional()
-                      .openapi({
-                        description: 'Database document identifier of the event',
-                      }),
+                    docId: z.string().optional().openapi({
+                      description: 'Database document identifier of the event',
+                    }),
                   })
                   .openapi({
                     description: 'List of fees collected on chain by the integrator',

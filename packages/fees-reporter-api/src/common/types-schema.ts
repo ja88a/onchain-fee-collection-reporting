@@ -45,7 +45,7 @@ const isChainKey = (chain: string) => {
 }
 
 export const ChainKeySchema = z.custom(isChainKey, {
-  message: 'Not a valid LI.FI chain key'
+  message: 'Not a valid LI.FI chain key',
 })
 
 export const ChainKeySchemaSpec = ChainKeySchema.openapi({
