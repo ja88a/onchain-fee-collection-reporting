@@ -49,8 +49,9 @@ export class FeeCollectedEventUtils {
 }
 
 export class DbError extends Error {
-  constructor(message: string) {
+  constructor(message: string, cause?: Error) {
     super(message)
     this.name = 'DbError'
+    this.cause = cause
   }
 }

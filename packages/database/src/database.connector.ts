@@ -185,40 +185,6 @@ export async function disconnectFromMongoDB(): Promise<void> {
 }
 
 /**
- * Checks if MongoDB connection is healthy by running a simple ping command
- * @param config MongoDB connection configuration
- * @returns Promise that resolves to true if MongoDB is healthy, false otherwise
- */
-export async function isMongoDBHealthy(
-  config: MongoDBConfig = DEFAULT_MONGODB_CONFIG
-): Promise<boolean> {
-  try {
-    if (mongoose.connection.readyState === 1) {
-      // Already connected
-      await mongoose.connection.db.command({ ping: 1 })
-      return true
-    }
-
-    // Not connected, try to connect temporarily to check health
-    const connectionString = buildMongoDBConnectionString(config)
-    const client = mongoose.createConnection(connectionString, {
-      ...config.options,
-      serverSelectionTimeoutMS: 5000, // Short timeout just for health check
-    })
-
-    try {
-      const admin = client.db.admin()
-      await admin.ping()
-      return true
-    } finally {
-      await client.close(true)
-    }
-  } catch (error) {
-    throw new DbError(`MongoDB health check failed: ${error}`)
-  }
-}
-
-/**
  * Builds a MongoDB connection string from configuration
  */
 function buildMongoDBConnectionString(config: MongoDBConfig): string {

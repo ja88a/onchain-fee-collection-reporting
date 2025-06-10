@@ -7,7 +7,7 @@ import { BigNumber } from 'ethers/lib/ethers'
  * Service for storing and retrieving FeeCollected events emitted by the FeeCollector contract to/from the database
  */
 export class FeeCollectedEventStore {
-  private readonly logger = wLogger.child({
+  private logger = wLogger.child({
     label: FeeCollectedEventStore.name,
   })
 
