@@ -16,6 +16,7 @@ import { FeeCollector__factory } from '@jabba01/lfcr-lifi-contract-typings-feeco
 import { ChainKey } from '@lifi/types'
 import { BigNumber, ethers } from 'ethers'
 import { ResultEventScrapingSession } from './dto/event-scraping-result.dto'
+import { EventScrapingError } from './utils'
 
 /**
  * Service for scraping LI.FI FeeCollector contracts' events.
@@ -95,7 +96,7 @@ export class FeeCollectionEventScraper {
       feeCollectorContract,
       chainConfig
     ).catch((error) => {
-      throw new Error(
+      throw new EventScrapingError(
         `Failed to extract and store events from chain '${chainKey}'\n${error.stack}`
       )
     })

@@ -25,6 +25,7 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": false,
-    "target": "ESNext"
+    "target": "ESNext",
+    "types": ["vitest/globals", "@types/jest", "node"],
   }
 }

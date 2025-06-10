@@ -13,7 +13,7 @@ export const feeCollectedReportingApi = {
       .createApp()
       .get('/report/:integrator', ...getFeesCollectedByIntegrator(factory, tag))
       .get('/events/:integrator', ...getFeesCollectedEventsByIntegrator(factory, tag))
-      .get('/scrap/:chain', ...postScrapFeesCollectedOnChain(factory, tag)),
+      .post('/scrap/:chain', ...postScrapFeesCollectedOnChain(factory, tag)),
   config: createApiConfig({
     title: 'Collected Fees Reporting API',
     description:

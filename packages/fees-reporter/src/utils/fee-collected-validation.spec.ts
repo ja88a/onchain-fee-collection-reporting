@@ -1,3 +1,5 @@
+import 'reflect-metadata'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { IntegratorFeesCollectedReport } from '../data'
 import {
   createIntegratorFeesCollectedReport,
@@ -77,7 +79,7 @@ describe('validateReport', () => {
       '0x1234567890123456789012345678901234567890ZZ'
     )
     const validConstraints = validationErrs[0].constraints
-    expect(validConstraints != null)
+    expect(validConstraints).not.toBeNull()
     expect(validConstraints).toEqual({
       isEthereumAddress: 'integrator must be an Ethereum address',
       isHexadecimal: 'integrator must be a hexadecimal number',
