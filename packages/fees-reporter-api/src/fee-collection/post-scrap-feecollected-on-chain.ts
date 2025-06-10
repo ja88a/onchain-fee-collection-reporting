@@ -1,4 +1,3 @@
-import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { startScraping } from '@jabba01/lfcr-events-scraper'
 import { ChainKey } from '@lifi/types'
 import { Env } from 'hono'
@@ -6,11 +5,7 @@ import { describeRoute } from 'hono-openapi'
 import { resolver, validator } from 'hono-openapi/zod'
 import { Factory } from 'hono/factory'
 import { z } from 'zod'
-import { AddressSchemaSpec, ChainKeySchemaSpec, Int256, ITag } from '../common'
-
-const logger = wLogger.child({
-  label: 'postScrapFeesCollectedOnChain',
-})
+import { ChainKeySchemaSpec, ITag } from '../common'
 
 export function postScrapFeesCollectedOnChain<E extends Env, TTag extends ITag>(
   factory: Factory<E>,

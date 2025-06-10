@@ -94,7 +94,7 @@ export class FeeCollectedEventStore {
   }
 
   /** Mapping utility method: Convert a stored doc into an external data model instance */
-  private convertToEntity(doc: any): FeeCollectedEventParsed {
+  private convertToEntity(doc): FeeCollectedEventParsed {
     return {
       docId: doc.id,
       chainKey: doc.chainKey,

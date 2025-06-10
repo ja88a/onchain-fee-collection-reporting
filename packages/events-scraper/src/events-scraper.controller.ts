@@ -27,7 +27,7 @@ export const startScraping = async (
 
   // Scrap latest FeeCollector events for the specified chain
   const service = new FeeCollectionEventScraper()
-  return await service.scrapFeeCollectorEvents(chain).catch((error: any) => {
+  return await service.scrapFeeCollectorEvents(chain).catch((error) => {
     const msgGenericMsg = `Failed scraping of FeeCollector events on chain '${chain}': ${error.cause?.message ?? error.message}`
     logger.error(`${msgGenericMsg} - Events Scraping ABORTED. \n${error.stack ?? error}`)
     throw new EventScrapingError(msgGenericMsg, 500, { cause: error })

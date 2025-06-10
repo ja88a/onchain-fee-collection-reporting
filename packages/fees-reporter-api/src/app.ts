@@ -4,7 +4,6 @@ import { createApiConfig } from './common'
 import { feeCollectedReportingApi } from './fee-collection'
 import {
   createErrorHandler,
-  errorHandler,
   httpHeaders,
   requestLogger,
 } from './middlewares'
@@ -14,7 +13,6 @@ export function getApp<E extends Env>(factory: Factory<E>) {
     factory
       .createApp()
       .onError(createErrorHandler(factory))
-      // .use(errorHandler)
       .use(requestLogger)
       .use(httpHeaders)
       .route('/fee-collection', feeCollectedReportingApi.createApp(factory))

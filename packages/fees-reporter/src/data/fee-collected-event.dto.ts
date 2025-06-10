@@ -1,5 +1,3 @@
-import { ChainKey } from '@lifi/types'
-
 /**
  * Info about FeeCollected Events emitted by FeeCollector contracts on any of their hosting blockchain
  */

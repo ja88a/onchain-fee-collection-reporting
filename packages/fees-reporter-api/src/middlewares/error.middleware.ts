@@ -4,7 +4,7 @@ import { ContentfulStatusCode } from 'hono/utils/http-status'
 import { logger as wLogger } from '@jabba01/lfcr-common'
 
 const logger = wLogger.child({
-  label: 'ErrorHandler',
+  label: 'ApiErrorHandler',
 })
 
 const createErrorResponse = (err: unknown) => ({

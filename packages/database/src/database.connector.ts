@@ -219,36 +219,6 @@ export async function isMongoDBHealthy(
 }
 
 /**
- * Waits for MongoDB to be healthy before proceeding
- * @param config MongoDB connection configuration
- * @param maxAttempts Maximum number of attempts to check health
- * @param intervalMs Interval between attempts in milliseconds
- * @returns Promise that resolves when MongoDB is healthy, rejects if max attempts reached
- */
-export async function waitForMongoDBHealth(
-  config: MongoDBConfig = DEFAULT_MONGODB_CONFIG,
-  maxAttempts = 10,
-  intervalMs = 2000
-): Promise<void> {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    logger.info(`MongoDB health check attempt ${attempt}/${maxAttempts}`)
-
-    const isHealthy = await isMongoDBHealthy(config)
-    if (isHealthy) {
-      logger.info('MongoDB is healthy')
-      return
-    }
-
-    if (attempt < maxAttempts) {
-      logger.warn(`MongoDB not healthy, retrying in ${intervalMs / 1000} seconds...`)
-      await new Promise((resolve) => setTimeout(resolve, intervalMs))
-    }
-  }
-
-  throw new DbError(`MongoDB not healthy after ${maxAttempts} attempts`)
-}
-
-/**
  * Builds a MongoDB connection string from configuration
  */
 function buildMongoDBConnectionString(config: MongoDBConfig): string {

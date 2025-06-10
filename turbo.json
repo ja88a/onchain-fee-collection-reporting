@@ -5,10 +5,23 @@
     "**/sample.env"
   ],
   "globalEnv": [
+    "NODE_ENV"
   ],
   "globalPassThroughEnv": [
-    "DATABASE_USER_NAME",
-    "DATABASE_USER_PWD"
+    "MONGODB_HOST",
+    "MONGODB_PORT",
+    "MONGODB_DATABASE",
+    "MONGODB_USERNAME",
+    "MONGODB_PASSWORD",
+    "LOG_LEVEL",
+    "API_PORT",
+    "VALIDATE_OUTPUT_COLLECTED_FEES_REPORTS",
+    "CHAIN_SCAN_BLOCKS_BATCH_SIZE",
+    "CHAIN_LATEST_BLOCK_TAG",
+    "CHAIN_QUERY_FAIL_RETRY_NB",
+    "CHAIN_POLYGON_RPC_URL",
+    "CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT",
+    "CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START"
   ],
   "tasks": {
     "build": {
@@ -24,6 +37,7 @@
       "dependsOn": [
         "^lint"
       ],
+      "cache": true,
       "outputLogs": "new-only"
     },
     "format": {
