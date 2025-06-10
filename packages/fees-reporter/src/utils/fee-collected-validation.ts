@@ -7,7 +7,7 @@ import {
   validate,
 } from 'class-validator'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
-import { IntegratorFeesCollectedReport } from '../data'
+import { ChainTokenAmount, IntegratorFeesCollectedReport } from '../data'
 
 /** Logger */
 const logger = wLogger.child({
@@ -28,6 +28,40 @@ export const VALID_OPT: ValidatorOptions = {
     value: true,
   },
   stopAtFirstError: false,
+}
+
+/**
+ * Convert a plain JSON object to a proper IntegratorFeesCollectedReport instance
+ *
+ * This conversion is required only for the validation of the IntegratorFeesCollectedReport
+ */
+export const createIntegratorFeesCollectedReport = (
+  report: IntegratorFeesCollectedReport
+): IntegratorFeesCollectedReport => {
+  const validReport = Object.assign(new IntegratorFeesCollectedReport(), report)
+
+  const validIntegratorFeesCollected = Array.from(
+    report.integratorFeesCollected.values()
+  ).map((value) =>
+    Object.assign(new ChainTokenAmount(), {
+      chainKey: value.chainKey,
+      token: value.token,
+      amount: value.amount.toString(),
+    })
+  )
+  validReport.integratorFeesCollected = validIntegratorFeesCollected
+
+  const validLifiFeesCollected = Array.from(report.lifiFeesCollected.values()).map(
+    (value) =>
+      Object.assign(new ChainTokenAmount(), {
+        chainKey: value.chainKey,
+        token: value.token,
+        amount: value.amount.toString(),
+      })
+  )
+  validReport.lifiFeesCollected = validLifiFeesCollected
+
+  return validReport
 }
 
 /**
@@ -60,7 +94,7 @@ export async function validateReport(
  * @param account The account ID to validate.
  * @returns A list of validation errors if the ID is not valid, empty if it is valid.
  */
-export function validateAccountId(account: string): ValidationError[] {
+export function validateIntegratorAccountAddress(account: string): ValidationError[] {
   if (isAlphanumeric(account) && isHexadecimal(account) && isEthereumAddress(account)) {
     return []
   }
@@ -70,7 +104,7 @@ export function validateAccountId(account: string): ValidationError[] {
       value: account,
       constraints: {
         isAlphanumeric: 'Unsupported integrator address',
-        isEthereumAddress: 'Invalid Ethereum address',
+        isEthereumAddress: 'Invalid EVM address',
       },
     },
   ]

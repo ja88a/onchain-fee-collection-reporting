@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@repo/lib-config-typescript/nest.json",
+  "extends": "@repo/lib-config-typescript/permissive.json",
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,

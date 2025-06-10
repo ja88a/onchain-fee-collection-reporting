@@ -1,8 +1,7 @@
 import {
   IntegratorFeesCollectedReport,
-  createIntegratorFeesCollectedReport,
 } from '../data'
-import { validateReport } from './fee-collected-validation'
+import { createIntegratorFeesCollectedReport, validateReport } from './fee-collected-validation'
 
 describe('validateReport', () => {
   beforeEach(async () => {})

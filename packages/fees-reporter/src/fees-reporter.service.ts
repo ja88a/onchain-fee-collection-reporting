@@ -1,7 +1,9 @@
 import { IntegratorFeesCollectedReport } from './data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { FeeCollectedEventStore } from '@jabba01/lfcr-database/dist/services'
-import { ChainTokenFeesBN } from './data/fee-collection-chain'
+import { ChainTokenFeesBN } from './data/fee-collection-chain.dto'
+import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
+import { FeeCollectionReportDatabaseError } from './utils'
 
 /**
  * Collected Fees reporting service
@@ -27,7 +29,13 @@ export class FeeCollectedReportService {
     const integratorFeeCollectedEvents =
       await this.feeCollectedEventPersistence.retrieveFeeCollectedEventsByIntegrator(
         integratorId
-      )
+      ).catch((error) => {
+        throw new FeeCollectionReportDatabaseError(
+          `Failed to retrieve FeeCollected events for integrator '${integratorId}'.`,
+          500,
+          { cause: error }
+        )
+      })
 
     // Sum up the collected fees for each chain token
     const collectedFeesIntegrator = new Map<string, ChainTokenFeesBN>()
@@ -75,5 +83,32 @@ export class FeeCollectedReportService {
         amount: value.amount.toString(),
       })),
     }
+  }
+  /**
+   * Retrieve the FeeCollected events for a given integrator
+   * from the persistence layer.
+   *
+   * @param integratorAccount Onchain account address of the integrator.
+   * @param limitNumber Maximum number of events to retrieve. If set to `0`, no limit is applied.
+   * @param pageNumber Offset for pagination, the data set / page number.
+   * @returns A list of collected fee events associated to the integrator.
+   */
+  async getFeeCollectionEventsByIntegrator(
+    integratorAccount: string,
+    limitNumber: number,
+    pageNumber: number
+  ): Promise<FeeCollectedEventParsed[]> {
+    const docsOffset = pageNumber * limitNumber
+    return await this.feeCollectedEventPersistence.retrieveFeeCollectedEventsByIntegrator(
+      integratorAccount,
+      limitNumber,
+      docsOffset
+    ).catch((error) => {
+      throw new FeeCollectionReportDatabaseError(
+        `Failed to retrieve FeeCollected events for integrator '${integratorAccount}'. Limit '${limitNumber}' Page '${pageNumber}'.`,
+        500,
+        { cause: error }
+      )
+    })
   }
 }

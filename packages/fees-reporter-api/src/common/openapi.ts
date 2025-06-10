@@ -15,7 +15,7 @@ const ZodErrorSchema = z
   })
 
 const ZodResponse = {
-  description: 'Zod Error',
+  description: 'Zod Validation Error',
   content: {
     'application/json': {
       schema: resolver(ZodErrorSchema),

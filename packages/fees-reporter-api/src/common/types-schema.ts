@@ -1,3 +1,4 @@
+import { ChainKey } from '@lifi/types'
 import { zeroAddress, isAddress, isHex, isHash, zeroHash } from 'viem'
 import { z } from 'zod'
 
@@ -38,3 +39,17 @@ function createInt256(corce) {
 export const Int256 = createInt256((x) => x)
 
 export const Int256Positive = createInt256((x) => x.min(BigInt(0)))
+
+const isChainKey = (chain: string) => {
+  return chain && Object.values(ChainKey).includes(<ChainKey>chain)
+}
+
+export const ChainKeySchema = z.custom(isChainKey, {
+  message: 'Not a valid LI.FI chain key'
+})
+
+export const ChainKeySchemaSpec = ChainKeySchema.openapi({
+  type: 'string',
+  examples: [ChainKey.POL, ChainKey.OPT, ChainKey.BSC],
+  description: 'Blockchain unique identification key',
+})

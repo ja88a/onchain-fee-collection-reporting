@@ -3,7 +3,7 @@ import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { ContentfulStatusCode } from 'hono/utils/http-status'
 
 const logger = wLogger.child({
-  label: 'ApiRequestMW',
+  label: 'ApiRequest',
 })
 
 export const requestLogger = async (c: Context, next: Next) => {
@@ -12,6 +12,3 @@ export const requestLogger = async (c: Context, next: Next) => {
   if ([200, 201].includes(<ContentfulStatusCode>c.res.status)) logger.info(logMsg)
   else logger.warn(logMsg)
 }
-
-// import { logger } from 'hono/logger'
-// export const apiRequestLogger = logger
