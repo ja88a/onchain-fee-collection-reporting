@@ -1,7 +1,7 @@
 {
   "name": "@jabba01/lfcr-database",
   "version": "0.1.0",
-  "description": "MongoDB database client for the LI.FI FeeCollection Reporter offchain service.",
+  "description": "MongoDB database connector for the LI.FI FeeCollection Reporter offchain services.",
   "author": {
     "name": "Jabba ø1",
     "email": "jabba@srenault.com",
