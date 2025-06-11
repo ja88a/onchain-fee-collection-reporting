@@ -62,9 +62,6 @@
       "outputLogs": "new-only"
     },
     "start": {
-      "dependsOn": [
-        "^start"
-      ],
       "cache": false,
       "outputLogs": "full"
     }

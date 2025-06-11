@@ -58,14 +58,24 @@ pnpm init:workspace
 
 You can refer to the [`package.json`](./package.json) scripts for the individual commands that are run by the above command.
 
+### Environment variables
+
+If not already done via `pnpm init:workspace`, you can create a `.env` file in the root dir of the project, by copying the content of the `.env.sample` file. Then, set the environment variables according to your needs.
+
+This is an optional step since default values are set, none of the environment variables require to be explicitly set.
+
+Notice that the variable values in `.env` enable customizing the run configuration of the scraper and the fees reporter service: against a running MongoDB instance started from previous Docker Compose based launch, but also those are used by the services when ran individually, e.g. via a node CLI command like `pnpm start` ran in sub dir packages/*.
+
 ## Running the Apps Locally
 
-Quick ways to run the apps locally is to use the provided npm scripts. 
+### All-in-one
 
-The main entry points from the repository root dir are:
+Quick ways to run the apps locally is to use the provided npm scripts, refer to [package.json](./package.json).
+
+Refer to the 2 main entry points to choose from, i.e. a CLI command to run from the repository root dir:
 
 - `pnpm docker:up` - Start the Collected Fees Reporting server API and a MongoDB server via Docker Compose.
-- `pnpm start` - Start the DB server, an Events Scraping session and the Collected Fees Reporting server API as Node.js applications.
+- `pnpm docker:db:start && pnpm start` - Start the DB server in Docker, an Events Scraping session and the Collected Fees Reporting server API locally as Node.js applications, running in parallel.
 
 ### Start MongoDB via Docker Compose
 
@@ -123,26 +133,36 @@ pnpm docker:build && pnpm docker:run
 
 The default port of this server API is `3000`, but it can be customized via the .env variable `API_PORT`.
 
-#### Endpoints
+### Endpoints
 
 OpenAPI v3 specifications of the exposed REST API endpoints is available in a JSON format at [/openapi](http://localhost:3000/openapi)
+
+#### Start Scraping Events
+
+To initiate a new scraping session for onchain events, you can use the following REST API endpoint. This might consist in a long polling operation, depending on the target blockchain and the number of blocks to scan.
 
 Initiate a new onchain events scraping session:
 
 - API Endpoint: [POST /fee-collection/scrap/*:chain*](http://localhost:3000/fee-collection/scrap/:chain)
 - Sample Polygon chain: POST /fee-collection/scrap/pol
 
+#### Report Total Fees Collected by an Integrator
+
 Report the total fees collected by an integrator:
 
 - API Endpoint: [GET /fee-collection/report/*:integrator*](http://localhost:3000/fee-collection/report/:integrator)
 - Integrator sample: GET /fee-collection/report/0x60bFaC7318e576A535cE8EA3Bfe0a45A803Bfa0B
+
+#### Report Fees Collection Events by Integrator
 
 Report all fee collection events related to an integrator, most recent first:
 
 - API Endpoint: [GET /fee-collection/events/*:integrator[?limit=&offset=]*](http://localhost:3000/fee-collection/events/:integrator?limit=20&offset=0)
 - Sample: <http://localhost:3000/fee-collection/events/0x60bFaC7318e576A535cE8EA3Bfe0a45A803Bfa0B?limit=25&offset=0>
 
-OpenAPI specs:
+#### Functional API Endpoints
+
+Get the OpenAPI specs, which describe the available API endpoints in JSON format:
 
 - API Endpoint: [GET /open-api](http://localhost:3000/open-api)
 - Locally running: <http://localhost:3000/openapi> (JSON format)
@@ -152,17 +172,11 @@ Server health check:
 - API Endpoint: [GET /health](http://localhost:3000/health)
 - Sample: <http://localhost:3000/health>
 
-### Start an Events Scraping session
+### Initiating an Events Scraping session
 
-The blocks of the specified target blockchain are scanned and the found `FeeCollector.FeeCollected` events are imported into MongoDB.
+The blocks of the specified target blockchain are scanned and the found `FeeCollector.FeesCollected` events are extracted, transformed and loaded into the Mongo database.
 
-#### Environment variables
-
-If not already done via `pnpm init:repo`, create a `.env` file in the root of the project, by copying the content of the `.env.sample` file. Then, set the environment variables according to your needs. This is an optional step since default values are set, none of the environment variables require to be explicitly set.
-
-Actual values in `.env.sample` enable customizing the local run of the scraper and reporter service, against a locally running MongoDB instance started from previous Docker Compose based launch, but also are used by the services when ran individually, e.g. via a node CLI command.
-
-#### As a nodejs app
+#### Start the nodejs app
 
 To run the events scraper as a Node.js application, you can use the following command:
 
@@ -171,9 +185,34 @@ To run the events scraper as a Node.js application, you can use the following co
 cd ./packages/events-scraper && pnpm start
 ```
 
-The default target blockchain is then 'Polygon mainnet' (key: `pol`), and the target LiFi FeeCollector contract is [`0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9`](https://polygonscan.com/address/0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9#events).
+The default target blockchain is then 'Polygon mainnet' (key: `pol`), and the target LI.FI FeeCollector contract is [`0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9`](https://polygonscan.com/address/0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9#events).
 
-Refer to [events-scraper main](./events-scraper/src/main.ts) and the chains' configuration in [fee-collector.config](./common/src/config/fee-collector.config.ts) to change the default config.
+Refer to [events-scraper main](./packages/events-scraper/src/main.ts) and the chains' configuration in [fee-collector.config](./packages/common/src/config/fee-collector.config.ts) to change the default config.
+
+#### Trigger a scraping session via the backend API
+
+To trigger a scraping session via the REST API, you can use the endpoint
+`POST /fee-collection/scrap/:chain`
+
+The target chain is specified in the URL path, e.g. `pol` for Polygon mainnet. The chain must be registered in the [fee-collector.config](./packages/common/src/config/fee-collector.config.ts) file.
+
+You can run a tool like curl to initiate the POST request. Make sure the server is running, then run this command:
+
+```sh
+# Trigger a scraping session for the Polygon chain
+curl -X POST http://localhost:3000/fee-collection/scrap/pol
+```
+
+#### Configuration options
+
+You can configure the target chain and the LI.FI FeeCollector contract address in the [fee-collector.config.ts](./packages/common/src/config/fee-collector.config.ts) file. The configuration is used by both the events scraper and the fees reporter.
+
+You can also customize the following environment variables in the [`.env`](./.env.sample) file:
+
+- `CHAIN_SCAN_BLOCKS_BATCH_SIZE`: The number of blocks to scan in each batch during the scraping session. Default is `10000`.
+- `CHAIN_POLYGON_RPC_URL`: The RPC URL for the Polygon mainnet. Default is `https://polygon-rpc.com`.
+- `CHAIN_POLYGON_FEE_COLLECTOR_CONTRACT`: The address of the LI.FI FeeCollector contract on the Polygon mainnet. Default is `0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9`.
+- `CHAIN_POLYGON_FEE_COLLECTOR_BLOCK_START`: The block number to start scanning for events. Default is `70000000`.
 
 ## Test
 

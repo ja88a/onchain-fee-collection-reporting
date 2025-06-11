@@ -35,7 +35,7 @@
     "docker:stop": "docker compose stop",
     "docker:down": "docker compose down",
     "docker:db:start": "dotenv -e ./.env -- docker compose up -d lfcr-db",
-    "start": "pnpm docker:db:start && turbo start --log-order stream",
+    "start": "turbo start --log-order stream",
     "test": "turbo test --log-order stream",
     "reset": "turbo reset && shx rm -rf node_modules .turbo",
     "turbo:stop": "turbo daemon clean"
