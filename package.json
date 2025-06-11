@@ -22,7 +22,7 @@
   "license": "AGPL-3.0-only",
   "private": true,
   "scripts": {
-    "init:env": "find . -name 'sample.env' -execdir cp .env.sample .env \\;",
+    "init:env": "find . -name '.env.sample' -execdir cp .env.sample .env \\;",
     "init:lifi-contract-types": "git submodule update --init --recursive && cd lib/lifi-contract-types && npm pkg delete scripts.build && cd -",
     "init:workspace": "pnpm init:lifi-contract-types && pnpm install && turbo telemetry disable && pnpm build && pnpm init:env",
     "build": "turbo build --log-order stream",
@@ -34,9 +34,9 @@
     "docker:up:rebuild": "pnpm i && dotenv -e ./.env -- docker compose up --force-recreate --build --remove-orphans",
     "docker:stop": "docker compose stop",
     "docker:down": "docker compose down",
-    "docker:db:start": "docker compose up -d lfcr-db",
-    "start": "turbo start --log-order stream",
-    "test": "turbo test",
+    "docker:db:start": "dotenv -e ./.env -- docker compose up -d lfcr-db",
+    "start": "pnpm docker:db:start && turbo start --log-order stream",
+    "test": "turbo test --log-order stream",
     "reset": "turbo reset && shx rm -rf node_modules .turbo",
     "turbo:stop": "turbo daemon clean"
   },

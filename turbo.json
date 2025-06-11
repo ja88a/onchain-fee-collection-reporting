@@ -2,12 +2,12 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "globalDependencies": [
-    "**/sample.env"
+    ".env.sample"
   ],
   "globalEnv": [
-    "NODE_ENV"
   ],
   "globalPassThroughEnv": [
+    "NODE_ENV",
     "MONGODB_HOST",
     "MONGODB_PORT",
     "MONGODB_DATABASE",
@@ -29,7 +29,7 @@
         "^build"
       ],
       "outputs": [
-        "dist/**"
+        "dist"
       ],
       "outputLogs": "new-only"
     },
@@ -57,7 +57,7 @@
         "^test"
       ],
       "outputs": [
-        "coverage/**"
+        "coverage"
       ],
       "outputLogs": "new-only"
     },

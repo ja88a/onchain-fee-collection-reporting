@@ -1,4 +1,4 @@
-# LiFi FeeCollector Events Reporter
+# LI.FI Fees Collection Reporting
 
 ## Overview
 
@@ -8,11 +8,13 @@ Scrap and report the collection of onchain fees supported by the LI.FI protocol 
 
 This is a mono-repository for developing and running 2 main backend services, on top of the [LI.FI protocol](https://li.fi):
 
-1. A scraper of on-chain events: `FeesCollected` events emitted by the LI.FI `FeeCollector` contracts deployed on many blockchains. A scraping session can be triggered manually from the command line or via a dedicated REST API endpoint as part of the backend API.
+1. A scraper of onchain event logs: `FeesCollected` emitted by LI.FI `FeeCollector` contracts, deployed on many blockchains. A scraping session can be triggered manually from the command line or via a dedicated REST API endpoint.
 
 2. A backend REST API to report the fees collected by integrators of the LI.FI protocol: Endpoints enable to query the fees collection event for a given integrator, as well as the total fees collected by an integrator.
 
-A database stores and indexes the collected onchain events, as well as the supported chains' configuration for their scanning. The scraper feeds the DB while the reporter consumes those events data.
+A database stores and indexes the collected onchain events, as well as the supported chains' configuration for their scanning.
+
+The events scraper feeds the DB while the fees collection reporter consumes, reads and relays those events data.
 
 ### Technical Stack
 
@@ -58,6 +60,13 @@ You can refer to the [`package.json`](./package.json) scripts for the individual
 
 ## Running the Apps Locally
 
+Quick ways to run the apps locally is to use the provided npm scripts. 
+
+The main entry points from the repository root dir are:
+
+- `pnpm docker:up` - Start the Collected Fees Reporting server API and a MongoDB server via Docker Compose.
+- `pnpm start` - Start the DB server, an Events Scraping session and the Collected Fees Reporting server API as Node.js applications.
+
 ### Start MongoDB via Docker Compose
 
 You can run locally only the Mongo database:
@@ -84,9 +93,9 @@ These commands will start the services defined in the [`docker-compose.yml`](./d
 
 Values set in the `.env` file are integrated in the Docker runtime environment.
 
-To stop running the services, you can use:
+To stop running the docker services, you can use:
 
-```bash
+```sh
 # Stop the running containers
 pnpm docker:stop
 
@@ -120,30 +129,32 @@ OpenAPI v3 specifications of the exposed REST API endpoints is available in a JS
 
 Initiate a new onchain events scraping session:
 
-- REST API: [POST /fee-collection/scrap/*:chain*](http://localhost:3000/fee-collection/scrap/:chain)
+- API Endpoint: [POST /fee-collection/scrap/*:chain*](http://localhost:3000/fee-collection/scrap/:chain)
 - Sample Polygon chain: POST /fee-collection/scrap/pol
 
 Report the total fees collected by an integrator:
 
-- Endpoint: [GET /fee-collection/report/*:integrator*](http://localhost:3000/fee-collection/report/:integrator)
+- API Endpoint: [GET /fee-collection/report/*:integrator*](http://localhost:3000/fee-collection/report/:integrator)
 - Integrator sample: GET /fee-collection/report/0x60bFaC7318e576A535cE8EA3Bfe0a45A803Bfa0B
 
 Report all fee collection events related to an integrator, most recent first:
 
-- Endpoint: [GET /fee-collection/events/*:integrator[?limit=&offset=]*](http://localhost:3000/fee-collection/events/:integrator?limit=20&offset=0)
+- API Endpoint: [GET /fee-collection/events/*:integrator[?limit=&offset=]*](http://localhost:3000/fee-collection/events/:integrator?limit=20&offset=0)
 - Sample: <http://localhost:3000/fee-collection/events/0x60bFaC7318e576A535cE8EA3Bfe0a45A803Bfa0B?limit=25&offset=0>
 
 OpenAPI specs:
 
-- Endpoint: [GET /open-api](http://localhost:3000/open-api)
+- API Endpoint: [GET /open-api](http://localhost:3000/open-api)
 - Locally running: <http://localhost:3000/openapi> (JSON format)
 
 Server health check:
 
-- Endpoint: [GET /health](http://localhost:3000/health)
+- API Endpoint: [GET /health](http://localhost:3000/health)
 - Sample: <http://localhost:3000/health>
 
 ### Start an Events Scraping session
+
+The blocks of the specified target blockchain are scanned and the found `FeeCollector.FeeCollected` events are imported into MongoDB.
 
 #### Environment variables
 
@@ -151,12 +162,13 @@ If not already done via `pnpm init:repo`, create a `.env` file in the root of th
 
 Actual values in `.env.sample` enable customizing the local run of the scraper and reporter service, against a locally running MongoDB instance started from previous Docker Compose based launch, but also are used by the services when ran individually, e.g. via a node CLI command.
 
-#### As a Nodejs-based CLI command
+#### As a nodejs app
 
-The blocks of the specified target blockchain are scanned and the found `FeeCollector.FeeCollected` events are imported into MongoDB.
+To run the events scraper as a Node.js application, you can use the following command:
 
-```bash
-cd ./events-scraper && pnpm start
+```sh
+# Start the events scraper as a Node.js app
+cd ./packages/events-scraper && pnpm start
 ```
 
 The default target blockchain is then 'Polygon mainnet' (key: `pol`), and the target LiFi FeeCollector contract is [`0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9`](https://polygonscan.com/address/0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9#events).
@@ -167,12 +179,14 @@ Refer to [events-scraper main](./events-scraper/src/main.ts) and the chains' con
 
 The project is tested using [vitest](https://vitest.dev/).
 
-```bash
+You can run the tests using the following commands, either from the root of the mono-repo or from the individual packages:
+
+```sh
 # unit tests
-$ pnpm test
+pnpm test
 
 # e2e tests
-$ pnpm test:e2e
+pnpm test:e2e
 ```
 
 ## License

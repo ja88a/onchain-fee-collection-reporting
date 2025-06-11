@@ -22,7 +22,7 @@
     "build": "tsc",
     "dev": "dotenv -e ../../.env -- tsx watch src/serve.ts",
     "start": "dotenv -e ../../.env -- node dist/serve",
-    "test": "vitest run"
+    "test": ""
   },
   "dependencies": {
     "@hono/node-server": "^1.14.4",

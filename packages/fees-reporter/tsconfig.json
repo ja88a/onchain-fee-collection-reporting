@@ -3,8 +3,7 @@
   "extends": "@repo/lib-config-typescript/permissive.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "baseUrl": ".",
-    "strictPropertyInitialization": false
+    "baseUrl": "."
   },
   "include": ["src", "test"],
   "exclude": ["node_modules", "dist"]
