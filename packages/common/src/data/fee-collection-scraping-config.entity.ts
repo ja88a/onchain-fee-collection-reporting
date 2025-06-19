@@ -8,7 +8,7 @@ export const enum EEventScrapingStatus {
   INACTIVE = 'inactive',
 }
 
-/** Default block tags to use for retrieving the last available block on a blockchain */
+/** Default block tags to use for retrieving blocks from a blockchain, by considering them as valid/confirmed enough. */
 export const enum EBlockTagLatest {
   /** Safe to use block, almost confirmed/finalized */
   SAFE = 'safe',
@@ -16,9 +16,10 @@ export const enum EBlockTagLatest {
   FINALIZED = 'finalized',
   /** Latest minted block */
   LATEST = 'latest',
-  /** Default tag to retrieve last block */
-  default = FINALIZED,
 }
+
+/** Default tag of blocks to be considered valid/confirmed */
+export const BlockTagLatestDefault = EBlockTagLatest.FINALIZED
 
 /**
  * Configuration settings for the target blockchain to scan
@@ -33,9 +34,15 @@ export type ChainProperties = {
   /** URL of the JSON RPC provider */
   rpcUrl: string
 
+  /** Optional private API key for the RPC provider */
+  rpcKey?: string
+
   /** the chain specific tag enabling to get its last block number.
    * The tag to use for retrieving a chain [safe | finalized] last block. */
   lastBlockTag: string | number
+
+  /** The number of blocks to fetch in a single request for a batch of blocks to scan */
+  blockBatchSize: number
 }
 
 /**
@@ -45,10 +52,10 @@ export type FeeCollectorProperties = {
   /** the onchain address of the LI.FI FeeCollector contract */
   contract: string
 
-  /** the block number from which to start seeking for FeeCollected events */
+  /** the block number from which to start seeking for events */
   blockStart: number
 
-  /** the number of last scanned block while seeking for onchain events */
+  /** The last scanned block number processed when corresponding blockchain was/is scanned */
   lastScanBlock?: number
 
   /** Last time a scan of block events was performed, epoch in ms */

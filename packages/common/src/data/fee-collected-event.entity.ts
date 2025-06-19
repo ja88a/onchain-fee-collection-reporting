@@ -29,4 +29,7 @@ export type FeeCollectedEventParsed = {
 
   /** DB document identifier */
   docId?: string
+
+  /** The schema version of the document */
+  version?: number
 }
