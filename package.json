@@ -38,7 +38,8 @@
     "start": "turbo start --log-order stream",
     "test": "turbo test --log-order stream",
     "reset": "turbo reset && shx rm -rf node_modules .turbo",
-    "turbo:stop": "turbo daemon clean"
+    "turbo:stop": "turbo daemon clean",
+    "turbo:watch": "turbo watch build --filter @jabba01/lfcr-fees-reporter-api --continue --log-order stream"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

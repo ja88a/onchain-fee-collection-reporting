@@ -1,10 +1,11 @@
 import { FeeCollectionEventDoc, getFeeCollectionEventModel } from '../models'
 import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
+import { ChainKey } from '@lifi/types'
 import { BigNumber } from 'ethers/lib/ethers'
 
 /**
- * Service for storing and retrieving FeeCollected events emitted by the FeeCollector contract to/from the database
+ * Service for storing and retrieving FeesCollected events, emitted by the FeeCollector contract, to/from the database
  */
 export class FeeCollectedEventStore {
   private logger = wLogger.child({
@@ -22,7 +23,7 @@ export class FeeCollectedEventStore {
    * @returns instance of the stored FeeCollected event
    */
   async createFeeCollectedEvent(feeCollectedEvent: FeeCollectedEventParsed) {
-    const doc = this.convertToDoc(feeCollectedEvent)
+    const doc = convertToDoc(feeCollectedEvent)
     return await this.FeeCollectionEventModel.create(doc)
   }
 
@@ -33,13 +34,13 @@ export class FeeCollectedEventStore {
    * @returns instances of the stored FeeCollected events
    */
   async storeFeeCollectedEvents(feeCollectedEvents: FeeCollectedEventParsed[]) {
-    const dbEntries = feeCollectedEvents.map((feeCollectedEvent) => {
-      return this.convertToDoc(feeCollectedEvent)
-    })
+    const dbEntries = feeCollectedEvents.map((feeCollectedEvent) =>
+      convertToDoc(feeCollectedEvent)
+    )
     return await this.FeeCollectionEventModel.insertMany(dbEntries, {
       ordered: false,
     }).catch((err) => {
-      this.logger.warn(`Attempted to insert already stored events. \n${err}`)
+      this.logger.warn(`Error met while inserting many FeesCollected events in DB \n${err}`)
     })
   }
 
@@ -73,37 +74,38 @@ export class FeeCollectedEventStore {
             integrator: integratorId,
           }).sort({ blockTag: 'desc' })
 
-    return feeCollectedEvents.map((feeCollectedEvent) => {
-      return this.convertToEntity(feeCollectedEvent)
-    })
+    return feeCollectedEvents.map((feeCollectedEvent) =>
+      convertToEntity(feeCollectedEvent)
+    )
   }
+}
 
-  /** Mapping utility method: Convert an external data model to a doc entry */
-  private convertToDoc(
-    feeCollectedEvent: FeeCollectedEventParsed
-  ): FeeCollectionEventDoc {
-    return {
-      chainKey: feeCollectedEvent.chainKey,
-      txHash: feeCollectedEvent.txHash,
-      blockTag: feeCollectedEvent.blockTag,
-      token: feeCollectedEvent.token,
-      integrator: feeCollectedEvent.integrator,
-      integratorFee: feeCollectedEvent.integratorFee.toString(),
-      lifiFee: feeCollectedEvent.lifiFee.toString(),
-    }
+/** Mapping utility method: Convert an external data model to a doc entry */
+const convertToDoc = (
+  feeCollectedEvent: FeeCollectedEventParsed
+): FeeCollectionEventDoc => {
+  return {
+    chainKey: feeCollectedEvent.chainKey,
+    txHash: feeCollectedEvent.txHash,
+    blockTag: feeCollectedEvent.blockTag,
+    token: feeCollectedEvent.token,
+    integrator: feeCollectedEvent.integrator,
+    integratorFee: feeCollectedEvent.integratorFee.toString(),
+    lifiFee: feeCollectedEvent.lifiFee.toString(),
+    schemaVersion: feeCollectedEvent.version,
   }
+}
 
-  /** Mapping utility method: Convert a stored doc into an external data model instance */
-  private convertToEntity(doc): FeeCollectedEventParsed {
-    return {
-      docId: doc.id,
-      chainKey: doc.chainKey,
-      txHash: doc.txHash,
-      blockTag: doc.blockTag,
-      token: doc.token,
-      integrator: doc.integrator,
-      integratorFee: BigNumber.from(doc.integratorFee),
-      lifiFee: BigNumber.from(doc.lifiFee),
-    }
+/** Mapping utility method: Convert a stored doc into an external data model instance */
+const convertToEntity = (doc: FeeCollectionEventDoc): FeeCollectedEventParsed => {
+  return {
+    version: doc.schemaVersion,
+    chainKey: <ChainKey>doc.chainKey,
+    txHash: doc.txHash,
+    blockTag: doc.blockTag,
+    token: doc.token,
+    integrator: doc.integrator,
+    integratorFee: BigNumber.from(doc.integratorFee),
+    lifiFee: BigNumber.from(doc.lifiFee),
   }
 }

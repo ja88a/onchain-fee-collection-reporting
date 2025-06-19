@@ -5,6 +5,8 @@ import { modelOptions } from '@typegoose/typegoose/lib/modelOptions'
 import { prop } from '@typegoose/typegoose/lib/prop'
 import { DbError } from '../database.utils'
 
+const SchemaVersionLatest = 1
+
 /**
  * Configuration settings for the target blockchain to scan
  */
@@ -21,9 +23,17 @@ class ChainPropertiesDoc {
   @prop()
   public rpcUrl!: string
 
+  /** Optional private API key for the RPC provider */
+  @prop({ required: false})
+  public rpcKey?: string
+
   /** the chain specific tag enabling to get its last block number */
   @prop({ allowMixed: Severity.ALLOW })
   public lastBlockTag!: string | number
+
+  /** The number of blocks to fetch in a single batch */
+  @prop({ required: true })
+  public blockBatchSize!: number
 }
 
 /**
@@ -51,13 +61,13 @@ class FeeCollectorPropertiesDoc {
  * Schema of the FeeCollector's blockchain configuration document
  */
 @modelOptions({
-  schemaOptions: { collection: 'FeeCollectionOnchainConfig', versionKey: 'version' },
-  options: { disableCaching: false, allowMixed: Severity.ALLOW },
+  schemaOptions: { collection: 'FeeCollectionOnchainConfig', versionKey: 'schemaVersion' },
+  options: { disableCaching: false },
 })
 export class FeeCollectionScrapingConfigDoc extends TimeStamps {
   /** Model version number */
-  @prop({ required: true })
-  public version?: number
+  @prop({ default: SchemaVersionLatest })
+  public schemaVersion?: number
 
   /** the target blockchain key, based on LI.FI data types */
   @prop({ unique: true, index: true })

@@ -54,7 +54,7 @@ export class FeeCollectionEventScraper {
 
     // Check that the FeeCollector chain scraping is enabled
     if (chainConfig.status === EEventScrapingStatus.INACTIVE) {
-      const logMsg = `FeeCollector Events Scraping sessions HALTED on chain '${chainKey}'. Last scanned block: ${chainConfig.feeCollector.lastScanBlock}`
+      const logMsg = `FeeCollector Events Scraping sessions HALTED on chain '${chainKey}'. Last scanned block: '${chainConfig.feeCollector.lastScanBlock}'`
       this.logger.warn(
         logMsg +
           ` on ${new Date(chainConfig.feeCollector.lastScanTime || 0).toISOString()}`
@@ -168,7 +168,7 @@ export class FeeCollectionEventScraper {
   ) {
     const chainKey = feeCollectorChainConfig.chainKey || ''
     let countCollectedEvents = 0
-    const batchSize = CHAIN_SCAN_BLOCKS_BATCH_SIZE
+    const batchSize = feeCollectorChainConfig.chain.blockBatchSize || CHAIN_SCAN_BLOCKS_BATCH_SIZE
     let blockStart = lastScannedBlockNb + 1
     while (blockStart <= chainLastBlockNb) {
       let blockEnd = blockStart + batchSize - 1

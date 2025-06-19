@@ -83,12 +83,13 @@ describe('FeeCollectionConfigStore', () => {
         id: 137,
         type: ChainType.EVM,
         rpcUrl: 'https://polygon-rpc.com',
-        lastBlockTag: 40000000,
+        lastBlockTag: 'finalized',
+        blockBatchSize: 1_000,
       },
       feeCollector: {
         contract: '0x1231231231231231231231231231231231231231',
-        blockStart: 30000000,
-        lastScanBlock: 39000000,
+        blockStart: 30_000_000,
+        lastScanBlock: 39_000_000,
         lastScanTime: Date.now(),
       },
     }

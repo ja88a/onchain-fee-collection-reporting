@@ -43,7 +43,7 @@ export class FeeCollectionConfigStore {
         `Failed to create Fee Collection Scraping config for chain '${chainKey}'. \n${err}`
       )
     })
-    return this.convertToEntity(doc)
+    return convertToEntity(doc)
   }
 
   /**
@@ -60,7 +60,7 @@ export class FeeCollectionConfigStore {
         `No event scraping configuration available for chain '${chainKey}'`
       )
     }
-    return doc ? this.convertToEntity(doc) : undefined
+    return doc ? convertToEntity(doc) : undefined
   }
 
   /**
@@ -91,28 +91,33 @@ export class FeeCollectionConfigStore {
         `No FeeCollection event scraping config '${config.docId}' found to report last scan info - block '${lastScannedBlock}'`
       )
     }
-    return this.convertToEntity(doc)
+    return convertToEntity(doc)
   }
+
+}
+
 
   /**
    * Convert a database document to a FeeCollectorChainConfig object.
    * @param doc the database document
    * @returns the FeeCollector Chain configuration
    */
-  private convertToEntity(
+const convertToEntity = (
     doc: Document<unknown, BeAnObject, FeeCollectionScrapingConfigDoc> &
       Omit<FeeCollectionScrapingConfigDoc & { _id: Types.ObjectId }, ''>
-  ): FeeCollectionScrapingConfig {
+  ): FeeCollectionScrapingConfig => {
     return {
       docId: doc.id,
-      version: doc.version,
+      version: doc.schemaVersion,
       chainKey: <ChainKey>doc.chainKey,
       status: <EEventScrapingStatus>doc.status,
       chain: {
         id: doc.chain.id,
         type: <ChainType>doc.chain.type,
         rpcUrl: doc.chain.rpcUrl,
+        rpcKey: doc.chain.rpcKey,
         lastBlockTag: doc.chain.lastBlockTag,
+        blockBatchSize: doc.chain.blockBatchSize,
       },
       feeCollector: {
         contract: doc.feeCollector.contract,
@@ -122,4 +127,3 @@ export class FeeCollectionConfigStore {
       },
     }
   }
-}

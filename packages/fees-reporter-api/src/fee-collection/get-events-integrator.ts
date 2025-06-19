@@ -75,17 +75,21 @@ export function getFeesCollectedEventsByIntegrator<E extends Env, TTag extends I
     validator(
       'query',
       z.object({
-        limit: z.string().optional(),
-        offset: z.string().optional(),
+        limit: z.string().optional().openapi({
+          description: 'Maximum number of events to return, default size is 20',
+        }),
+        page: z.string().optional().openapi({
+          description: 'Index of the event result page to start from, considering the set limit, default is 0',
+        }),
       })
     ),
     async (c) => {
       const { integrator } = c.req.valid('param')
-      const { limit, offset } = c.req.valid('query')
+      const { limit, page } = c.req.valid('query')
       const report = await getFeeCollectionEventsByIntegrator(
         <string>integrator,
         parseInt(limit) ?? 20,
-        parseInt(offset) ?? 0
+        parseInt(page) ?? 0
       )
       return c.json(report, 200)
     }

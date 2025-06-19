@@ -21,7 +21,8 @@ export function getApp<E extends Env>(factory: Factory<E>) {
 
 export const appConfig = createApiConfig({
   title: 'LI.FI Fee Collection Reporting API',
-  description: 'API for reporting on-chain fee collection events',
+  description: 'API for reporting on-chain fee collection events.\n\n' +
+    'This API provides endpoints to retrieve fee collection events, reports by integrator, and initiate scraping sessions for fee collection events on various chains.',
 })
 
 export type IApp<E extends Env = Env> = ReturnType<typeof getApp<E>>

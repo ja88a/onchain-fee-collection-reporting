@@ -123,6 +123,7 @@ describe('FeeCollectionEventScraper', () => {
       type: 'EVM',
       rpcUrl: mockRpcUrl,
       lastBlockTag: CHAIN_LATEST_BLOCK_TAG,
+      blockBatchSize: CHAIN_SCAN_BLOCKS_BATCH_SIZE,
     },
     feeCollector: {
       contract: mockContractAddress,

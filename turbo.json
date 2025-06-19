@@ -1,11 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [
-    ".env.sample"
-  ],
-  "globalEnv": [
-  ],
+  "globalDependencies": [".env.sample"],
+  "globalEnv": [],
   "globalPassThroughEnv": [
     "NODE_ENV",
     "MONGODB_HOST",
@@ -25,25 +22,17 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["dist"],
       "outputLogs": "new-only"
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ],
+      "dependsOn": ["^lint"],
       "cache": true,
       "outputLogs": "new-only"
     },
     "format": {
-      "dependsOn": [
-        "^format"
-      ],
+      "dependsOn": ["^format"],
       "outputLogs": "new-only"
     },
     "clean": {
@@ -53,12 +42,8 @@
       "cache": false
     },
     "test": {
-      "dependsOn": [
-        "^test"
-      ],
-      "outputs": [
-        "coverage"
-      ],
+      "dependsOn": ["^test"],
+      "outputs": ["dist", "coverage"],
       "outputLogs": "new-only"
     },
     "start": {

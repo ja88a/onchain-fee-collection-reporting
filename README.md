@@ -26,7 +26,7 @@ The [Hono](https://hono.dev/) app server development framework is used for build
 
 [Docker](https://docker.com) container  is used for packaging and easily managing the composition of servers to run locally.
 
-[ethers](https://docs.ethers.io/v5/) is used for connecting to EVM blockchains and for decoding the `FeeCollector.FeesCollected` events. `viem` is considered to replace the ethers v5 integration, however the technique based on lifi-contract-typings [typechain](https://github.com/TypeChain/TypeChain) for integrating the LI.FI smart contracts is still in use.
+[ethers](https://docs.ethers.io/v5/) is used for connecting to EVM blockchains and for decoding the `FeeCollector.FeesCollected` events. [`viem`](https://viem.sh/) is considered to replace the ethers v5 integration, however the technique based on lifi-contract-typings [typechain](https://github.com/TypeChain/TypeChain) for integrating the LI.FI smart contracts is still in use.
 
 [vitest](https://vitest.dev/) is used for testing the modules.
 
@@ -144,7 +144,7 @@ To initiate a new scraping session for onchain events, you can use the following
 Initiate a new onchain events scraping session:
 
 - API Endpoint: [POST /fee-collection/scrap/*:chain*](http://localhost:3000/fee-collection/scrap/:chain)
-- Sample Polygon chain: POST /fee-collection/scrap/pol
+- Sample for the Polygon chain: POST /fee-collection/scrap/pol
 
 #### Report Total Fees Collected by an Integrator
 
@@ -157,8 +157,9 @@ Report the total fees collected by an integrator:
 
 Report all fee collection events related to an integrator, most recent first:
 
-- API Endpoint: [GET /fee-collection/events/*:integrator[?limit=&offset=]*](http://localhost:3000/fee-collection/events/:integrator?limit=20&offset=0)
-- Sample: <http://localhost:3000/fee-collection/events/0x60bFaC7318e576A535cE8EA3Bfe0a45A803Bfa0B?limit=25&offset=0>
+- API Endpoint: [GET /fee-collection/events/*:integrator[?limit=&page=]*](http://localhost:3000/fee-collection/events/:integrator?limit=20)
+- Sample: <http://localhost:3000/fee-collection/events/0x60bFaC7318e576A535cE8EA3Bfe0a45A803Bfa0B?limit=20>
+- Minimal pagination support via the optional `limit` and `page` query parameters. Default values of `50`, max `100`, events to retrieve per request is made configurable.
 
 #### Functional API Endpoints
 

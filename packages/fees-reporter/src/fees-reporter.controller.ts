@@ -1,5 +1,9 @@
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
-import { VALIDATE_OUTPUT_COLLECTED_FEES_REPORTS } from './config/service.config'
+import {
+  RESULT_EVENTS_PER_PAGE,
+  RESULT_EVENTS_PER_PAGE_MAX,
+  VALIDATE_OUTPUT_COLLECTED_FEES_REPORTS,
+} from './config/service.config'
 import { FeeCollectedEventDto, IntegratorFeesCollectedReport } from './data'
 import { FeeCollectedReportService } from './fees-reporter.service'
 import { FeeCollectionReportError, FeeCollectionReportInputError } from './utils'
@@ -73,17 +77,17 @@ export const reportFeesCollectedByIntegrator = async (
  * Retrieves the fee collection events for a specific integrator.
  *
  * @param integratorAccount The onchain account address of the integrator.
- * @param limit Optional limit for the number of events to retrieve.
- * @param offset Optional offset for pagination, the page / data set offset number, per the set limit size.
+ * @param limit Optional limit for the number of events to be retrieved [within a page]. The maximum limit is 100, default is 50.
+ * @param page Optional offset for pagination, the page number, considering the set limit size.
  * @returns List of fee collection events associated with the integrator.
  */
 export const getFeeCollectionEventsByIntegrator = async (
   integratorAccount: string,
   limit?: number,
-  offset?: number
+  page?: number
 ): Promise<FeeCollectedEventDto[]> => {
   logger.info(
-    `FeeCollection events requested for integrator '${integratorAccount}' - Limit '${limit}' and page offset '${offset}'`
+    `FeeCollection events requested for integrator '${integratorAccount}' - Limit '${limit}' and page offset '${page}'`
   )
 
   // Validate the input parameters
@@ -93,13 +97,19 @@ export const getFeeCollectionEventsByIntegrator = async (
       `Unsupported integrator ID '${integratorAccount}' requested \n${JSON.stringify(validationErrors)}`
     )
   }
-  const limitNumber = limit ? Number(limit) : 50
-  const offsetNumber = offset ? Number(offset) : 0
 
-  // Get the fee collection events
+  const pageLimit = limit
+    ? limit > RESULT_EVENTS_PER_PAGE_MAX
+      ? RESULT_EVENTS_PER_PAGE_MAX
+      : limit
+    : RESULT_EVENTS_PER_PAGE
+
+  const pageNumber = page ? Number(page) : 0
+
+  // Retrieve the stored fee collection events
   const feesReporterService = new FeeCollectedReportService()
   const feeCollectionEvents = await feesReporterService
-    .getFeeCollectionEventsByIntegrator(integratorAccount, limitNumber, offsetNumber)
+    .getFeeCollectionEventsByIntegrator(integratorAccount, pageLimit, pageNumber)
     .catch((error) => {
       logger.error(
         `Failed to get fee collection events for integrator '${integratorAccount}'. \n${error.stack ?? error}`
