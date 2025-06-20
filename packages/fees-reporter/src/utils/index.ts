@@ -1,1 +1,2 @@
-export * from './errors'
+export * from './fees-reporter-errors.utils'
+export * from './fee-collected-validation'

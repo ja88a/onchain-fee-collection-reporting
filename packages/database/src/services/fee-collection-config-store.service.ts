@@ -93,37 +93,35 @@ export class FeeCollectionConfigStore {
     }
     return convertToEntity(doc)
   }
-
 }
 
-
-  /**
-   * Convert a database document to a FeeCollectorChainConfig object.
-   * @param doc the database document
-   * @returns the FeeCollector Chain configuration
-   */
+/**
+ * Convert a database document to a FeeCollectorChainConfig object.
+ * @param doc the database document
+ * @returns the FeeCollector Chain configuration
+ */
 const convertToEntity = (
-    doc: Document<unknown, BeAnObject, FeeCollectionScrapingConfigDoc> &
-      Omit<FeeCollectionScrapingConfigDoc & { _id: Types.ObjectId }, ''>
-  ): FeeCollectionScrapingConfig => {
-    return {
-      docId: doc.id,
-      version: doc.schemaVersion,
-      chainKey: <ChainKey>doc.chainKey,
-      status: <EEventScrapingStatus>doc.status,
-      chain: {
-        id: doc.chain.id,
-        type: <ChainType>doc.chain.type,
-        rpcUrl: doc.chain.rpcUrl,
-        rpcKey: doc.chain.rpcKey,
-        lastBlockTag: doc.chain.lastBlockTag,
-        blockBatchSize: doc.chain.blockBatchSize,
-      },
-      feeCollector: {
-        contract: doc.feeCollector.contract,
-        blockStart: doc.feeCollector.blockStart,
-        lastScanBlock: doc.feeCollector.lastScanBlock,
-        lastScanTime: doc.feeCollector.lastScanTime,
-      },
-    }
+  doc: Document<unknown, BeAnObject, FeeCollectionScrapingConfigDoc> &
+    Omit<FeeCollectionScrapingConfigDoc & { _id: Types.ObjectId }, ''>
+): FeeCollectionScrapingConfig => {
+  return {
+    docId: doc.id,
+    version: doc.schemaVersion,
+    chainKey: <ChainKey>doc.chainKey,
+    status: <EEventScrapingStatus>doc.status,
+    chain: {
+      id: doc.chain.id,
+      type: <ChainType>doc.chain.type,
+      rpcUrl: doc.chain.rpcUrl,
+      rpcKey: doc.chain.rpcKey,
+      lastBlockTag: doc.chain.lastBlockTag,
+      blockBatchSize: doc.chain.blockBatchSize,
+    },
+    feeCollector: {
+      contract: doc.feeCollector.contract,
+      blockStart: doc.feeCollector.blockStart,
+      lastScanBlock: doc.feeCollector.lastScanBlock,
+      lastScanTime: doc.feeCollector.lastScanTime,
+    },
   }
+}

@@ -1,1 +1,1 @@
-export * from './errors'
+export * from './events-scraper-errors.utils'

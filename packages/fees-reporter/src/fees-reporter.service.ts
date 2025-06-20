@@ -2,7 +2,7 @@ import { IntegratorFeesCollectedReport } from './data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { FeeCollectedEventStore } from '@jabba01/lfcr-database/dist/services'
 import { ChainTokenFeesBN } from './data/fee-collection-chain.dto'
-import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
+import { FeeCollectedEvent } from '@jabba01/lfcr-common/dist/data'
 import { FeeCollectionReportDatabaseError } from './utils'
 
 /**
@@ -31,7 +31,6 @@ export class FeeCollectedReportService {
       .catch((error) => {
         throw new FeeCollectionReportDatabaseError(
           `Failed to retrieve FeeCollected events for integrator '${integratorId}'.`,
-          500,
           { cause: error }
         )
       })
@@ -96,14 +95,13 @@ export class FeeCollectedReportService {
     integratorAccount: string,
     limitNumber: number,
     pageNumber: number
-  ): Promise<FeeCollectedEventParsed[]> {
+  ): Promise<FeeCollectedEvent[]> {
     const docsOffset = pageNumber * limitNumber
     return await this.feeCollectedEventPersistence
       .retrieveFeeCollectedEventsByIntegrator(integratorAccount, limitNumber, docsOffset)
       .catch((error) => {
         throw new FeeCollectionReportDatabaseError(
           `Failed to retrieve FeeCollected events for integrator '${integratorAccount}'. Limit '${limitNumber}' Page '${pageNumber}'.`,
-          500,
           { cause: error }
         )
       })

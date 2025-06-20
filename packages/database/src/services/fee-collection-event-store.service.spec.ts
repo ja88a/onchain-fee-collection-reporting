@@ -1,4 +1,4 @@
-import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
+import { FeeCollectedEvent } from '@jabba01/lfcr-common/dist/data'
 import { ChainKey } from '@lifi/types'
 import { BigNumber } from 'ethers/lib/ethers'
 import { FeeCollectedEventStore } from './fee-collection-event-store.service'
@@ -52,8 +52,8 @@ import { getFeeCollectionEventModel } from '../models'
 
 describe('FeeCollectedEventStore', () => {
   let service: FeeCollectedEventStore
-  let mockEvent: FeeCollectedEventParsed
-  let mockEvents: FeeCollectedEventParsed[]
+  let mockEvent: FeeCollectedEvent
+  let mockEvents: FeeCollectedEvent[]
   let mockModel: any
 
   // Setup before each test

@@ -1,5 +1,5 @@
 import { FeeCollectionEventDoc, getFeeCollectionEventModel } from '../models'
-import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
+import { FeeCollectedEvent } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { ChainKey } from '@lifi/types'
 import { BigNumber } from 'ethers/lib/ethers'
@@ -22,7 +22,7 @@ export class FeeCollectedEventStore {
    * @param feeCollectedEvent a FeeCollector.FeeCollected event to persist
    * @returns instance of the stored FeeCollected event
    */
-  async createFeeCollectedEvent(feeCollectedEvent: FeeCollectedEventParsed) {
+  async createFeeCollectedEvent(feeCollectedEvent: FeeCollectedEvent) {
     const doc = convertToDoc(feeCollectedEvent)
     return await this.FeeCollectionEventModel.create(doc)
   }
@@ -33,7 +33,7 @@ export class FeeCollectedEventStore {
    * @param feeCollectedEvents a list of FeeCollector.FeeCollected contract events to persist
    * @returns instances of the stored FeeCollected events
    */
-  async storeFeeCollectedEvents(feeCollectedEvents: FeeCollectedEventParsed[]) {
+  async storeFeeCollectedEvents(feeCollectedEvents: FeeCollectedEvent[]) {
     const dbEntries = feeCollectedEvents.map((feeCollectedEvent) =>
       convertToDoc(feeCollectedEvent)
     )
@@ -61,7 +61,7 @@ export class FeeCollectedEventStore {
     integratorId: string,
     limit?: number,
     offset?: number
-  ): Promise<FeeCollectedEventParsed[]> {
+  ): Promise<FeeCollectedEvent[]> {
     const feeCollectedEvents =
       limit > 0
         ? await this.FeeCollectionEventModel.find({
@@ -82,7 +82,7 @@ export class FeeCollectedEventStore {
 
 /** Mapping utility method: Convert an external data model to a doc entry */
 const convertToDoc = (
-  feeCollectedEvent: FeeCollectedEventParsed
+  feeCollectedEvent: FeeCollectedEvent
 ): FeeCollectionEventDoc => {
   return {
     chainKey: feeCollectedEvent.chainKey,
@@ -97,8 +97,9 @@ const convertToDoc = (
 }
 
 /** Mapping utility method: Convert a stored doc into an external data model instance */
-const convertToEntity = (doc: FeeCollectionEventDoc): FeeCollectedEventParsed => {
+const convertToEntity = (doc: FeeCollectionEventDoc): FeeCollectedEvent => {
   return {
+    docId: (doc as any).id,
     version: doc.schemaVersion,
     chainKey: <ChainKey>doc.chainKey,
     txHash: doc.txHash,

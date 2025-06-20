@@ -7,7 +7,7 @@ import {
 } from '@jabba01/lfcr-common/dist/config'
 import {
   EEventScrapingStatus,
-  FeeCollectedEventParsed,
+  FeeCollectedEvent,
   FeeCollectionScrapingConfig,
 } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
@@ -16,7 +16,7 @@ import { FeeCollector__factory } from '@jabba01/lfcr-lifi-contract-typings-feeco
 import { ChainKey } from '@lifi/types'
 import { BigNumber, ethers } from 'ethers'
 import { ResultEventScrapingSession } from './dto/event-scraping-result.dto'
-import { EventScrapingError } from './utils'
+import { EventScrapingDatabaseError, EventScrapingError } from './utils'
 
 /**
  * Service for scraping LI.FI FeeCollector contracts' events.
@@ -30,11 +30,42 @@ export class FeeCollectionEventScraper {
     label: FeeCollectionEventScraper.name,
   })
 
-  /** DB service for the FeeCollection config */
+  /** DB service for the FeeCollection chain config storage */
   private readonly dbFeeCollectionConfig = new FeeCollectionConfigStore()
 
-  /** DB service for the FeeCollection events */
+  /** DB service for the FeeCollection Events storage */
   private readonly dbFeeCollectionEvent = new FeeCollectedEventStore()
+
+  /**
+   * Retrieves the FeeCollector chain configuration from the database
+   * If it doesn't exist, it will be created from the available default configurations
+   * @param chainKey the unique LI.FI key of the target blockchain hosting the LI.FI FeeCollector contract
+   * @returns the target FeeCollector chain configuration
+   */
+  async retrieveFeeCollectionConfig(
+    chainKey: ChainKey
+  ): Promise<FeeCollectionScrapingConfig> {
+    const storedConfig = await this.dbFeeCollectionConfig.getByChain(chainKey)
+    if (!storedConfig) {
+      const feeCollectorChainConfig = feeCollectorChainConfigDefault.get(chainKey)
+      if (!feeCollectorChainConfig) {
+        throw new Error(
+          `No configuration found for scraping FeeCollector events on chain '${chainKey}'`
+        )
+      }
+      this.logger.debug(
+        `Persisting FeeCollector scraping config for chain '${chainKey}'`
+      )
+      return await this.dbFeeCollectionConfig.createFeeCollectorEventScrapingConfig(
+        chainKey,
+        feeCollectorChainConfig
+      )
+    }
+    this.logger.info(
+      `FeeCollector scraping config for chain '${chainKey}': ${JSON.stringify(storedConfig)}`
+    )
+    return storedConfig
+  }
 
   /**
    * Initiates the scraping of latest events emitted by the LI.FI FeeCollector contract
@@ -143,7 +174,7 @@ export class FeeCollectionEventScraper {
           return result.chainLastBlockNb
         } else {
           throw new Error(
-            `Failed to retrieve last block number for chain '${chainConfig.chainKey}' using the Block Tag '${lastBlockTag}'\n${error.stack}`
+            `Failed to retrieve last block number of chain '${chainConfig.chainKey}' using the Block Tag '${lastBlockTag}'\n${error.stack}`
           )
         }
       })
@@ -166,7 +197,7 @@ export class FeeCollectionEventScraper {
     feeCollectorContract: ethers.Contract,
     feeCollectorChainConfig: FeeCollectionScrapingConfig
   ) {
-    const chainKey = feeCollectorChainConfig.chainKey || ''
+    const chainKey = feeCollectorChainConfig.chainKey
     let countCollectedEvents = 0
     const batchSize = feeCollectorChainConfig.chain.blockBatchSize || CHAIN_SCAN_BLOCKS_BATCH_SIZE
     let blockStart = lastScannedBlockNb + 1
@@ -185,7 +216,12 @@ export class FeeCollectionEventScraper {
         feeCollectorContract,
         blockStart,
         blockEnd
-      )
+      ).catch((error) => {
+        throw new EventScrapingError(
+          `Failed to load FeeCollected events from chain '${chainKey}' for blocks '${blockStart}' to '${blockEnd}'`,
+          { cause: error }
+        )
+      })
 
       if (feeCollectedEvents.length > 0) {
         this.logger.info(
@@ -200,7 +236,12 @@ export class FeeCollectionEventScraper {
         )
 
         // Persist the fee collected events
-        await this.dbFeeCollectionEvent.storeFeeCollectedEvents(feeCollectedEventsParsed)
+        await this.dbFeeCollectionEvent.storeFeeCollectedEvents(feeCollectedEventsParsed).catch((error) => {
+          throw new EventScrapingDatabaseError(
+            `Failed to store FeeCollected events in DB for chain '${chainKey}' out of blocks '${blockStart}' to '${blockEnd}'`,
+            { cause: error }
+          )
+        })
 
         countCollectedEvents += feeCollectedEvents.length
       }
@@ -209,43 +250,17 @@ export class FeeCollectionEventScraper {
       await this.dbFeeCollectionConfig.updateFeeCollectorLastScanInfo(
         feeCollectorChainConfig,
         blockEnd
-      )
+      ).catch((error) => {
+        throw new EventScrapingDatabaseError(
+          `Failed to update the last scanned block number for chain '${chainKey}' in DB after scanning blocks '${blockStart}' to '${blockEnd}'`,
+          { cause: error }
+        )
+      })
 
       // Update the start block number to scan the next batch of blocks
       blockStart = blockEnd + 1
     }
     return countCollectedEvents
-  }
-
-  /**
-   * Retrieves the FeeCollector chain configuration from the database
-   * If it doesn't exist, it will be created from the available default configurations
-   * @param chainKey the unique LI.FI key of the target blockchain hosting the LI.FI FeeCollector contract
-   * @returns the target FeeCollector chain configuration
-   */
-  async retrieveFeeCollectionConfig(
-    chainKey: ChainKey
-  ): Promise<FeeCollectionScrapingConfig> {
-    const storedConfig = await this.dbFeeCollectionConfig.getByChain(chainKey)
-    if (!storedConfig) {
-      const feeCollectorChainConfig = feeCollectorChainConfigDefault.get(chainKey)
-      if (!feeCollectorChainConfig) {
-        throw new Error(
-          `No configuration found for scraping FeeCollector events on chain '${chainKey}'`
-        )
-      }
-      this.logger.debug(
-        `Persisting a FeeCollector scraping config for chain '${chainKey}'`
-      )
-      return await this.dbFeeCollectionConfig.createFeeCollectorEventScrapingConfig(
-        chainKey,
-        feeCollectorChainConfig
-      )
-    }
-    this.logger.info(
-      `FeeCollector scraping config for chain '${chainKey}': ${JSON.stringify(storedConfig)}`
-    )
-    return storedConfig
   }
 
   /**
@@ -289,8 +304,9 @@ export class FeeCollectionEventScraper {
         )
         return this.loadFeeCollectorEvents(feeCollector, fromBlock, toBlock, retriesLeft)
       } else {
-        throw new Error(
-          `Failed to query FeeCollected events in blocks [${fromBlock}, ${toBlock}]\n${error.stack}`
+        throw new EventScrapingError(
+          `Failed to query FeeCollected events in blocks [${fromBlock}, ${toBlock}] w/ filter '${JSON.stringify(filter)}' \n${error.stack ?? error}`,
+          { cause: error }
         )
       }
     })
@@ -304,23 +320,22 @@ export class FeeCollectionEventScraper {
    * @returns
    */
   private parseFeeCollectorEvents(
-    chainKey: string,
+    chainKey: ChainKey,
     feeCollector: ethers.Contract,
     events: ethers.Event[]
-  ): FeeCollectedEventParsed[] {
+  ): FeeCollectedEvent[] {
     return events.map((event) => {
       const parsedEvent = feeCollector.interface.parseLog(event)
 
-      const feesCollected: FeeCollectedEventParsed = {
-        chainKey: <ChainKey>chainKey,
+      return {
+        chainKey: chainKey,
         txHash: event.transactionHash,
         blockTag: event.blockNumber,
         token: parsedEvent?.args[0],
         integrator: parsedEvent?.args[1],
         integratorFee: BigNumber.from(parsedEvent?.args[2]),
         lifiFee: BigNumber.from(parsedEvent?.args[3]),
-      }
-      return feesCollected
+      } satisfies FeeCollectedEvent
     })
   }
 }

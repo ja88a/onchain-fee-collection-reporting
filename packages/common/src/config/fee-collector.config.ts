@@ -12,7 +12,7 @@ export const VERSION_FEE_COLLECTOR_CHAIN_CONFIG_LATEST = 1
 /** Default max number of blocks used to define a range, a batch size, when iteratively scanning a chain */
 export const CHAIN_SCAN_BLOCKS_BATCH_SIZE = process.env.CHAIN_SCAN_BLOCKS_BATCH_SIZE
   ? parseInt(process.env.CHAIN_SCAN_BLOCKS_BATCH_SIZE)
-  : 2000
+  : 10_000
 
 /** Default block tags to use for retrieving the latest available block on a blockchain */
 export const CHAIN_LATEST_BLOCK_TAG = process.env.CHAIN_LATEST_BLOCK_TAG || 'finalized'

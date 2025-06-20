@@ -19,7 +19,7 @@ export const startScraping = async (
   chain: ChainKey
 ): Promise<ResultEventScrapingSession> => {
   // Validate the input chain key
-  if (!Object.values(ChainKey).includes(<ChainKey>chain)) {
+  if (!Object.values(ChainKey).includes(chain)) {
     throw new EventScrapingInputError(
       `Invalid chain key '${chain}' submitted - Events Scraping session aborted`
     )
@@ -30,6 +30,6 @@ export const startScraping = async (
   return await service.scrapFeeCollectorEvents(chain).catch((error) => {
     const msgGenericMsg = `Failed scraping of FeeCollector events on chain '${chain}': ${error.cause?.message ?? error.message}`
     logger.error(`${msgGenericMsg} - Events Scraping ABORTED. \n${error.stack ?? error}`)
-    throw new EventScrapingError(msgGenericMsg, 500, { cause: error })
+    throw new EventScrapingError(msgGenericMsg, { cause: error })
   })
 }

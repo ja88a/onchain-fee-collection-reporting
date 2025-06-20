@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers'
  * Data structure for a parsed FeeCollectedEvent emitted by FeeCollector contracts
  * on any of their hosting blockchain
  */
-export type FeeCollectedEventParsed = {
+export type FeeCollectedEvent = {
   /** Unique blockchain key from which the event come from */
   chainKey: ChainKey
 

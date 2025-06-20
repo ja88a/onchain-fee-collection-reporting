@@ -4,7 +4,7 @@ import {
 } from '@jabba01/lfcr-common/dist/config'
 import {
   EEventScrapingStatus,
-  FeeCollectedEventParsed,
+  FeeCollectedEvent,
   FeeCollectionScrapingConfig,
 } from '@jabba01/lfcr-common/dist/data'
 import { ChainKey } from '@lifi/types'
@@ -93,7 +93,7 @@ describe('FeeCollectionEventScraper', () => {
   ]
 
   // Mock parsed events
-  const mockParsedEvents: FeeCollectedEventParsed[] = [
+  const mockParsedEvents: FeeCollectedEvent[] = [
     {
       chainKey: mockChainKey,
       txHash: '0x123456',

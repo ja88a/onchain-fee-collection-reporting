@@ -12,7 +12,7 @@ import {
   validateIntegratorAccountAddress,
   validateReport,
 } from './utils/fee-collected-validation'
-import { FeeCollectedEventParsed } from '@jabba01/lfcr-common'
+import { FeeCollectedEvent } from '@jabba01/lfcr-common'
 
 const logger = wLogger.child({
   label: 'FeeCollectedReportController',
@@ -49,7 +49,6 @@ export const reportFeesCollectedByIntegrator = async (
       )
       throw new FeeCollectionReportError(
         `Failed to generate a collected fee report for integrator '${integratorAccount}'.`,
-        500,
         { cause: error }
       )
     })
@@ -116,7 +115,6 @@ export const getFeeCollectionEventsByIntegrator = async (
       )
       throw new FeeCollectionReportError(
         `Failed to get fee collection events for integrator '${integratorAccount}'.`,
-        500,
         { cause: error }
       )
     })
@@ -130,7 +128,7 @@ export const getFeeCollectionEventsByIntegrator = async (
  * @returns
  */
 const convertFeeEventsToDto = (
-  feeCollectionEvents: FeeCollectedEventParsed[]
+  feeCollectionEvents: FeeCollectedEvent[]
 ): FeeCollectedEventDto[] => {
   if (!feeCollectionEvents || feeCollectionEvents.length === 0) {
     return []

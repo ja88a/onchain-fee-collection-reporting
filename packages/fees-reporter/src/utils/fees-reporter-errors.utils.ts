@@ -1,12 +1,12 @@
-export class FeeCollectionReportError extends Error {
-  constructor(
-    message: string,
-    public code: number = 500,
-    options?: ErrorOptions
-  ) {
-    super(message, options)
+import { ErrorOptionsStatus, LfcrError } from "@jabba01/lfcr-common"
+
+/**
+ * Error thrown when a fee collection report scraping session fails.
+ */
+export class FeeCollectionReportError extends LfcrError {
+  constructor(message: string, options?: ErrorOptionsStatus) {
+    super(message, { ...options, status: options?.status ?? 500 })
     this.name = 'FeeCollectionReportError'
-    this.code = code
   }
 }
 
@@ -14,8 +14,8 @@ export class FeeCollectionReportError extends Error {
  * Error thrown when an event scraping session fails due to a time out issue.
  */
 export class FeeCollectionReportTimeoutError extends FeeCollectionReportError {
-  constructor(message: string, code: number = 504, options?: ErrorOptions) {
-    super(message, code, options)
+  constructor(message: string, options?: ErrorOptionsStatus) {
+    super(message, {...options, status: options?.status ?? 504})
     this.name = 'FeeCollectionReportTimeoutError'
   }
 }
@@ -24,8 +24,8 @@ export class FeeCollectionReportTimeoutError extends FeeCollectionReportError {
  * Error thrown when an event scraping session fails due to a database issue.
  */
 export class FeeCollectionReportDatabaseError extends FeeCollectionReportError {
-  constructor(message: string, code: number = 500, options?: ErrorOptions) {
-    super(message, code, options)
+  constructor(message: string, options?: ErrorOptionsStatus) {
+    super(message, {...options, status: options?.status ?? 500})
     this.name = 'FeeCollectionReportDatabaseError'
   }
 }
@@ -34,8 +34,8 @@ export class FeeCollectionReportDatabaseError extends FeeCollectionReportError {
  * Error thrown when an event scraping session fails due to a configuration issue.
  */
 export class FeeCollectionReportInputError extends FeeCollectionReportError {
-  constructor(message: string, code: number = 400, options?: ErrorOptions) {
-    super(message, code, options)
+  constructor(message: string, options?: ErrorOptionsStatus) {
+    super(message, {...options, status: options?.status ?? 400})
     this.name = 'FeeCollectionReportInputError'
   }
 }
