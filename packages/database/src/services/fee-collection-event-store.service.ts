@@ -40,7 +40,9 @@ export class FeeCollectedEventStore {
     return await this.FeeCollectionEventModel.insertMany(dbEntries, {
       ordered: false,
     }).catch((err) => {
-      this.logger.warn(`Error met while inserting many FeesCollected events in DB \n${err}`)
+      this.logger.error(
+        `Error met while inserting ${feeCollectedEvents?.length} FeesCollected events in DB: '${err}'`
+      )
     })
   }
 
@@ -81,9 +83,7 @@ export class FeeCollectedEventStore {
 }
 
 /** Mapping utility method: Convert an external data model to a doc entry */
-const convertToDoc = (
-  feeCollectedEvent: FeeCollectedEvent
-): FeeCollectionEventDoc => {
+const convertToDoc = (feeCollectedEvent: FeeCollectedEvent): FeeCollectionEventDoc => {
   return {
     chainKey: feeCollectedEvent.chainKey,
     txHash: feeCollectedEvent.txHash,

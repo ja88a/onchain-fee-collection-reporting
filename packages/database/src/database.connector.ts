@@ -19,18 +19,18 @@ export type MongoDBConfig = {
  */
 export const DEFAULT_MONGODB_CONFIG: MongoDBConfig = {
   host: process.env.MONGODB_HOST || 'localhost',
-  port: parseInt(process.env.MONGODB_PORT || '27017'),
+  port: parseInt(process.env.MONGODB_PORT) || 27017,
   database: process.env.MONGODB_DATABASE || 'fee-collection-reporting',
   username: process.env.MONGODB_USERNAME,
   password: process.env.MONGODB_PASSWORD,
   options: {
-    connectTimeoutMS: 30000, // 30 seconds
-    socketTimeoutMS: 60000, // 60 seconds
-    serverSelectionTimeoutMS: 30000, // 30 seconds
-    heartbeatFrequencyMS: 10000, // 10 seconds
+    connectTimeoutMS: 30_000,
+    socketTimeoutMS: 60_000,
+    serverSelectionTimeoutMS: 30_000,
+    heartbeatFrequencyMS: 10_000,
     maxPoolSize: 10,
-    minPoolSize: 2,
-    maxIdleTimeMS: 30000,
+    minPoolSize: 1,
+    maxIdleTimeMS: 30_000,
   },
 }
 
@@ -49,16 +49,20 @@ export class DatabaseConnector {
   static async init(config?: MongoDBConfig): Promise<void> {
     await connectToMongoDB(config)
       .catch((error) => {
-        throw new DbError(`Failed to initialize database.\n${error.stack ?? error}`)
+        throw new DbError(`Failed to initialize database connection.`, { cause: error })
       })
       .then(() => {
         // Verify connection is ready by checking mongoose.connection.readyState
         if (mongoose.connection.readyState !== 1) {
-          throw new DbError(
-            `MongoDB connection for mongoose not ready after initialization. State: '${mongoose.connection.readyState}'`
-          )
+          setTimeout(() => {
+            if (mongoose.connection.readyState !== 1) {
+              throw new DbError(
+                `MongoDB connection for mongoose not ready after initialization. State: '${mongoose.connection.readyState}'`
+              )
+            }
+            logger.info(`MongoDB connection ready`)
+          }, 500)
         }
-        logger.info(`MongoDB connection ready`)
       })
   }
 
@@ -67,7 +71,7 @@ export class DatabaseConnector {
    */
   static async close(): Promise<void> {
     await disconnectFromMongoDB().catch((error) => {
-      throw new DbError(`Failed to close database connection. \n${error.stack ?? error}`)
+      throw new DbError(`Failed to close database connection.`, { cause: error })
     })
   }
 }
@@ -94,7 +98,7 @@ export async function connectToMongoDB(
 
   while (retries > 0 && !connected) {
     try {
-      logger.info(
+      logger.debug(
         `Connecting to MongoDB at ${config.host}:${config.port}/${config.database} (${MAX_RETRIES - retries + 1}/${MAX_RETRIES} attempts)`
       )
 
@@ -106,7 +110,7 @@ export async function connectToMongoDB(
           bufferCommands: false, // Disable command buffering to fail fast
         })
         .catch((error) => {
-          throw new DbError(`Failed to connect to MongoDB: ${error}`)
+          throw new DbError(`Failed to connect to MongoDB`, { cause: error })
         })
 
       connected = true
@@ -150,26 +154,15 @@ export async function connectToMongoDB(
     logger.info('MongoDB reconnected')
   })
 
-  // Setup robust connection recovery
-  db.on('disconnected', async () => {
-    logger.warn('MongoDB disconnected, attempting to reconnect...')
-    try {
-      // Mongoose will try to reconnect automatically, but we add additional logic
-      if (!mongoose.connection.readyState) {
-        logger.info('Manually triggering reconnection attempt...')
-        await mongoose.connect(connectionString, config.options)
-      }
-    } catch (error) {
-      logger.error(`Failed to reconnect to MongoDB: ${error}`)
-    }
-  })
-
-  // Handle application termination
-  process.on('SIGINT', async () => {
-    await db.close()
-    logger.info('MongoDB connection closed due to application termination')
-    process.exit(0)
-  })
+  // Handle application interruption & termination
+  const handleAppExit = async () => {
+    logger.debug('MongoDB connection closing due to application termination')
+    await db.close().catch((error) => {
+      logger.error(`Error closing MongoDB connection`, { cause: error })
+    })
+  }
+  process.on('SIGINT', handleAppExit)
+  process.on('SIGTERM', handleAppExit)
 
   return db
 }
@@ -179,7 +172,7 @@ export async function connectToMongoDB(
  */
 export async function disconnectFromMongoDB(): Promise<void> {
   await mongoose.disconnect().catch((error) => {
-    throw new DbError(`Error disconnecting from MongoDB: ${error.stack ?? error}`)
+    throw new DbError(`Error met while disconnecting from MongoDB`, { cause: error })
   })
   logger.info('MongoDB disconnected successfully')
 }

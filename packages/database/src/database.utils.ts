@@ -1,3 +1,5 @@
+import { ErrorOptionsStatus, LfcrError } from '@jabba01/lfcr-common'
+
 /**
  * Utility for managing event scraping information in the database.
  */
@@ -48,10 +50,9 @@ export class FeeCollectedEventUtils {
   }
 }
 
-export class DbError extends Error {
-  constructor(message: string, cause?: Error) {
-    super(message)
+export class DbError extends LfcrError {
+  constructor(message: string, options?: ErrorOptionsStatus) {
+    super(message, { ...options, status: options?.status || 500 })
     this.name = 'DbError'
-    this.cause = cause
   }
 }

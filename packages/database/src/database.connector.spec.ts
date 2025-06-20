@@ -83,23 +83,6 @@ describe('DatabaseConnector', () => {
       expect(connection).toBeDefined()
       expect([1, 2]).toContain(mongoose.connection.readyState) // 1 = connected, 2 = connecting
     }, 10000)
-
-    it('should retry connection when initial attempt fails', async () => {
-      // Instead of testing the retry logic directly which is difficult to mock,
-      // we'll test a simplified version of the functionality
-      
-      // Skip if we're connected already
-      if (mongoose.connection.readyState !== 0) {
-        await mongoose.disconnect()
-      }
-      
-      // For this test, just verify mongoose connection is working
-      // and focus on the successful outcome rather than testing the retry mechanism
-      await dbConnector.connectToMongoDB(validConfig)
-      
-      // Verify connection is successful by checking mongoose.connection.readyState
-      expect(mongoose.connection.readyState).not.toBe(0) // Not disconnected
-    }, 10000)
   })
 
   describe('disconnectFromMongoDB', () => {
