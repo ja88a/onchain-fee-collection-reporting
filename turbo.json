@@ -1,11 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [
-    ".env.sample"
-  ],
-  "globalEnv": [
-  ],
+  "globalDependencies": [".env.sample"],
+  "globalEnv": [],
   "globalPassThroughEnv": [
     "NODE_ENV",
     "MONGODB_HOST",
@@ -15,7 +12,6 @@
     "MONGODB_PASSWORD",
     "LOG_LEVEL",
     "API_PORT",
-    "VALIDATE_OUTPUT_COLLECTED_FEES_REPORTS",
     "CHAIN_SCAN_BLOCKS_BATCH_SIZE",
     "CHAIN_LATEST_BLOCK_TAG",
     "CHAIN_QUERY_FAIL_RETRY_NB",
@@ -25,25 +21,17 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["dist"],
       "outputLogs": "new-only"
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ],
+      "dependsOn": ["^lint"],
       "cache": true,
       "outputLogs": "new-only"
     },
     "format": {
-      "dependsOn": [
-        "^format"
-      ],
+      "dependsOn": ["^format"],
       "outputLogs": "new-only"
     },
     "clean": {
@@ -53,12 +41,8 @@
       "cache": false
     },
     "test": {
-      "dependsOn": [
-        "^test"
-      ],
-      "outputs": [
-        "coverage"
-      ],
+      "dependsOn": ["^test"],
+      "outputs": ["dist", "coverage"],
       "outputLogs": "new-only"
     },
     "start": {

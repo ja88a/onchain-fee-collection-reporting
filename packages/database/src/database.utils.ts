@@ -1,3 +1,5 @@
+import { ErrorOptionsCustom, HttpStatusCode, LfcrError } from '@jabba01/lfcr-common'
+
 /**
  * Utility for managing event scraping information in the database.
  */
@@ -48,10 +50,12 @@ export class FeeCollectedEventUtils {
   }
 }
 
-export class DbError extends Error {
-  constructor(message: string, cause?: Error) {
-    super(message)
-    this.name = 'DbError'
-    this.cause = cause
+export class DbError extends LfcrError {
+  constructor(message: string, options?: ErrorOptionsCustom) {
+    super(message, {
+      ...options,
+      status: options?.status || HttpStatusCode.INTERNAL_SERVER_ERROR,
+    })
+    this.name = DbError.name
   }
 }

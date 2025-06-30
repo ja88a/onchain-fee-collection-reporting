@@ -61,7 +61,7 @@ const winstonConfigDev: LoggerOptions = {
       format: format.combine(
         format.colorize(),
         format.printf(({ timestamp, level, message, label, ...rest }) => {
-          return `${timestamp} ${level} [${label || 'lfcr-app'}]: ${message} ${
+          return `${timestamp} ${level} [${label || 'lfcr-app'}] ${message} ${
             Object.keys(rest).length ? JSON.stringify(rest) : ''
           }`
         })

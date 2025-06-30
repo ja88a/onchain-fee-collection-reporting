@@ -23,8 +23,7 @@
   "private": true,
   "scripts": {
     "init:env": "find . -name '.env.sample' -execdir cp .env.sample .env \\;",
-    "init:lifi-contract-types": "git submodule update --init --recursive && cd lib/lifi-contract-types && npm pkg delete scripts.build && cd -",
-    "init:workspace": "pnpm init:lifi-contract-types && pnpm install && turbo telemetry disable && pnpm build && pnpm init:env",
+    "init:workspace": "pnpm install && turbo telemetry disable && pnpm build && pnpm init:env",
     "build": "turbo build --log-order stream",
     "format": "turbo format --log-order stream",
     "lint": "turbo lint --log-order stream",
@@ -38,7 +37,8 @@
     "start": "turbo start --log-order stream",
     "test": "turbo test --log-order stream",
     "reset": "turbo reset && shx rm -rf node_modules .turbo",
-    "turbo:stop": "turbo daemon clean"
+    "turbo:stop": "turbo daemon clean",
+    "turbo:watch": "turbo watch build --filter @jabba01/lfcr-fees-reporter-api --continue --log-order stream"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

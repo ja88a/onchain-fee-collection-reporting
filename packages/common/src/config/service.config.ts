@@ -20,12 +20,11 @@ export const MS_CONFIG = {
 export enum EConfigRunMode {
   PROD = 'production',
   DEV = 'dev',
-  default = PROD,
 }
 
 /** NodeJS running execution mode.
  * @example 'production' */
-export const NODE_ENV = process.env.NODE_ENV || EConfigRunMode.default
+export const NODE_ENV = process.env.NODE_ENV || EConfigRunMode.PROD
 
 /** Toggle indicating is the Nodejs runtime environment is a production one.
  * @example true */

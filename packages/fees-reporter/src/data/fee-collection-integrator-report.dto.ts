@@ -1,13 +1,24 @@
-import {
-  IsNotEmpty,
-  IsHexadecimal,
-  IsEthereumAddress,
-  ValidateNested,
-  IsString,
-  IsNumberString,
-  IsArray,
-} from 'class-validator'
-import { Type } from 'class-transformer'
+import { ChainKey } from '@lifi/types'
+import { Address } from 'viem/_types'
+
+/**
+ * Total amount of fees per the chain and token asset
+ *
+ * The token symbol and decimals are to be retrieved from the chain.
+ */
+export class ChainTokenAmount {
+  /** Unique blockchain key, refer to LiFi data types */
+  chainKey: ChainKey
+
+  /** The token address on the specified chain */
+  token: Address
+
+  /** Total cumulated amount of the token collected as fees by the integrator. */
+  totalIntegrator: bigint
+
+  /** Total cumulated amount of the token collected as fees by LI.FI. */
+  totalLifi: bigint
+}
 
 /**
  * Report the collected fees by an integrator,
@@ -17,42 +28,8 @@ import { Type } from 'class-transformer'
  */
 export class IntegratorFeesCollectedReport {
   /** Address of the integrator */
-  @IsNotEmpty()
-  @IsHexadecimal()
-  @IsEthereumAddress()
-  integrator: string
+  integrator: Address
 
-  /** Fees collected by the integrator */
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ChainTokenAmount)
-  integratorFeesCollected: ChainTokenAmount[]
-
-  /** Share of the fees collected by LiFi */
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ChainTokenAmount)
-  lifiFeesCollected: ChainTokenAmount[]
-}
-
-/**
- * Total amount of fees per the chain and token asset
- *
- * The token symbol and decimals are to be retrieved from the chain.
- */
-export class ChainTokenAmount {
-  /** Unique blockchain key, refer to LiFi data types */
-  @IsString()
-  @IsNotEmpty()
-  chainKey: string
-
-  /** The token address on the specified chain */
-  @IsHexadecimal()
-  @IsEthereumAddress()
-  token: string
-
-  /** Total cumulated amount of the collected fees. A string representation of corresponding BigNumber available on chain */
-  @IsNumberString()
-  @IsNotEmpty()
-  amount: string
+  /** Fees collected by the integrator & LI.FI, per chain and per token */
+  feesCollected: ChainTokenAmount[]
 }

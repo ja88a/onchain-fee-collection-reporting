@@ -1,10 +1,16 @@
-import { FeeCollectionEventDoc, getFeeCollectionEventModel } from '../models'
-import { FeeCollectedEventParsed } from '@jabba01/lfcr-common/dist/data'
+import { FeeCollectedEvent } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
-import { BigNumber } from 'ethers/lib/ethers'
+import { ChainKey } from '@lifi/types'
+import { Address, parseUnits } from 'viem'
+import { DbError } from '../database.utils'
+import {
+  FeeCollectionEventDoc,
+  VersionDefaultFeesCollectedEvent,
+  getFeeCollectionEventModel,
+} from '../models'
 
 /**
- * Service for storing and retrieving FeeCollected events emitted by the FeeCollector contract to/from the database
+ * Service for storing and retrieving FeesCollected events, emitted by the FeeCollector contract, to/from the database
  */
 export class FeeCollectedEventStore {
   private logger = wLogger.child({
@@ -21,8 +27,8 @@ export class FeeCollectedEventStore {
    * @param feeCollectedEvent a FeeCollector.FeeCollected event to persist
    * @returns instance of the stored FeeCollected event
    */
-  async createFeeCollectedEvent(feeCollectedEvent: FeeCollectedEventParsed) {
-    const doc = this.convertToDoc(feeCollectedEvent)
+  async createFeeCollectedEvent(feeCollectedEvent: FeeCollectedEvent) {
+    const doc = convertToDoc(feeCollectedEvent)
     return await this.FeeCollectionEventModel.create(doc)
   }
 
@@ -32,14 +38,17 @@ export class FeeCollectedEventStore {
    * @param feeCollectedEvents a list of FeeCollector.FeeCollected contract events to persist
    * @returns instances of the stored FeeCollected events
    */
-  async storeFeeCollectedEvents(feeCollectedEvents: FeeCollectedEventParsed[]) {
-    const dbEntries = feeCollectedEvents.map((feeCollectedEvent) => {
-      return this.convertToDoc(feeCollectedEvent)
-    })
+  async storeFeeCollectedEvents(feeCollectedEvents: FeeCollectedEvent[]) {
+    const dbEntries = feeCollectedEvents.map((feeCollectedEvent) =>
+      convertToDoc(feeCollectedEvent)
+    )
     return await this.FeeCollectionEventModel.insertMany(dbEntries, {
       ordered: false,
     }).catch((err) => {
-      this.logger.warn(`Attempted to insert already stored events. \n${err}`)
+      throw new DbError(
+        `Error met while inserting ${feeCollectedEvents?.length} FeesCollected events in DB`,
+        { cause: err }
+      )
     })
   }
 
@@ -60,7 +69,7 @@ export class FeeCollectedEventStore {
     integratorId: string,
     limit?: number,
     offset?: number
-  ): Promise<FeeCollectedEventParsed[]> {
+  ): Promise<FeeCollectedEvent[]> {
     const feeCollectedEvents =
       limit > 0
         ? await this.FeeCollectionEventModel.find({
@@ -73,37 +82,37 @@ export class FeeCollectedEventStore {
             integrator: integratorId,
           }).sort({ blockTag: 'desc' })
 
-    return feeCollectedEvents.map((feeCollectedEvent) => {
-      return this.convertToEntity(feeCollectedEvent)
-    })
+    return feeCollectedEvents.map((feeCollectedEvent) =>
+      convertToEntity(feeCollectedEvent)
+    )
   }
+}
 
-  /** Mapping utility method: Convert an external data model to a doc entry */
-  private convertToDoc(
-    feeCollectedEvent: FeeCollectedEventParsed
-  ): FeeCollectionEventDoc {
-    return {
-      chainKey: feeCollectedEvent.chainKey,
-      txHash: feeCollectedEvent.txHash,
-      blockTag: feeCollectedEvent.blockTag,
-      token: feeCollectedEvent.token,
-      integrator: feeCollectedEvent.integrator,
-      integratorFee: feeCollectedEvent.integratorFee.toString(),
-      lifiFee: feeCollectedEvent.lifiFee.toString(),
-    }
+/** Mapping utility method: Convert an external data model to a doc entry */
+const convertToDoc = (feeCollectedEvent: FeeCollectedEvent): FeeCollectionEventDoc => {
+  return {
+    chainKey: feeCollectedEvent.chainKey,
+    txHash: feeCollectedEvent.txHash,
+    blockTag: feeCollectedEvent.blockTag?.toString(),
+    token: feeCollectedEvent.token,
+    integrator: feeCollectedEvent.integrator,
+    integratorFee: feeCollectedEvent.integratorFee?.toString(),
+    lifiFee: feeCollectedEvent.lifiFee?.toString(),
+    schemaVersion: feeCollectedEvent.version ?? VersionDefaultFeesCollectedEvent,
   }
+}
 
-  /** Mapping utility method: Convert a stored doc into an external data model instance */
-  private convertToEntity(doc): FeeCollectedEventParsed {
-    return {
-      docId: doc.id,
-      chainKey: doc.chainKey,
-      txHash: doc.txHash,
-      blockTag: doc.blockTag,
-      token: doc.token,
-      integrator: doc.integrator,
-      integratorFee: BigNumber.from(doc.integratorFee),
-      lifiFee: BigNumber.from(doc.lifiFee),
-    }
+/** Mapping utility method: Convert a stored doc into an external data model instance */
+const convertToEntity = (doc: FeeCollectionEventDoc): FeeCollectedEvent => {
+  return {
+    docId: (doc as any).id,
+    version: doc.schemaVersion,
+    chainKey: <ChainKey>doc.chainKey,
+    txHash: <`0x${string}`>doc.txHash,
+    blockTag: doc.blockTag,
+    token: <Address>doc.token,
+    integrator: <Address>doc.integrator,
+    integratorFee: doc.integratorFee ? parseUnits(doc.integratorFee, 0) : null,
+    lifiFee: doc.lifiFee ? parseUnits(doc.lifiFee, 0) : null,
   }
 }
