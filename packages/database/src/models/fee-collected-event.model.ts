@@ -8,7 +8,7 @@ import {
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { DbError } from '../database.utils'
 
-const SchemaVersionLatest = 1
+export const VersionDefaultFeesCollectedEvent = 1
 
 /**
  * Data structure for a parsed FeeCollectedEvent emitted by FeeCollector contracts
@@ -20,7 +20,7 @@ const SchemaVersionLatest = 1
 })
 export class FeeCollectionEventDoc extends TimeStamps {
   /** The schema version of the document */
-  @prop({ default: SchemaVersionLatest })
+  @prop({ default: VersionDefaultFeesCollectedEvent })
   public schemaVersion?: number
 
   /** The blockchain unique key where the event was emitted */
@@ -33,10 +33,9 @@ export class FeeCollectionEventDoc extends TimeStamps {
 
   /** The block tag when the event was triggered
    *
-   * Depending on the blockchain, it can consist in a block number or a block hash,
-   * hence the need for the model option `allowMixed: Severity.ALLOW` */
-  @prop({ allowMixed: Severity.ALLOW })
-  public blockTag!: number | string
+   * Depending on the blockchain, it can consist in a block number or a block hash */
+  @prop({ required: true })
+  public blockTag!: string
 
   /** Onchain address of the collected token, an hex string */
   @prop()

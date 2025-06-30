@@ -1,9 +1,9 @@
-import { IntegratorFeesCollectedReport } from './data'
+import { ChainTokenAmount, IntegratorFeesCollectedReport } from './data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { FeeCollectedEventStore } from '@jabba01/lfcr-database/dist/services'
-import { ChainTokenFeesBN } from './data/fee-collection-chain.dto'
 import { FeeCollectedEvent } from '@jabba01/lfcr-common/dist/data'
 import { FeeCollectionReportDatabaseError } from './utils'
+import { Address } from 'viem'
 
 /**
  * Collected Fees reporting service
@@ -36,50 +36,32 @@ export class FeeCollectedReportService {
       })
 
     // Sum up the collected fees for each chain token
-    const collectedFeesIntegrator = new Map<string, ChainTokenFeesBN>()
-    const collectedFeesLifi = new Map<string, ChainTokenFeesBN>()
-
-    for (let i = 0; i < integratorFeeCollectedEvents.length; i++) {
-      const event = integratorFeeCollectedEvents[i]
+    const chainTokensAmounts = new Map<string, Map<string, ChainTokenAmount>>()
+    integratorFeeCollectedEvents.forEach((event) => {
       const entryKey = `${event.chainKey}-${event.token}`
-
-      const integratorFeesForToken = collectedFeesIntegrator.get(entryKey)
-      if (!integratorFeesForToken) {
-        collectedFeesIntegrator.set(entryKey, {
+      if (!chainTokensAmounts.has(entryKey)) {
+        chainTokensAmounts.set(entryKey, new Map<string, ChainTokenAmount>())
+      }
+      const tokenMap = chainTokensAmounts.get(entryKey)!
+      if (!tokenMap.has(event.token)) {
+        tokenMap.set(event.token, {
           chainKey: event.chainKey,
           token: event.token,
-          amount: event.integratorFee,
+          totalIntegrator: event.integratorFee,
+          totalLifi: event.lifiFee,
         })
       } else {
-        integratorFeesForToken.amount.add(event.integratorFee)
+        const existingEntry = tokenMap.get(event.token)!
+        existingEntry.totalIntegrator += event.integratorFee
+        existingEntry.totalLifi += event.lifiFee
       }
-
-      const lifiFeesForToken = collectedFeesLifi.get(entryKey)
-      if (!lifiFeesForToken) {
-        collectedFeesLifi.set(entryKey, {
-          chainKey: event.chainKey,
-          token: event.token,
-          amount: event.lifiFee,
-        })
-      } else {
-        lifiFeesForToken.amount.add(event.lifiFee)
-      }
-    }
+    })
 
     return {
-      integrator: integratorId,
-      integratorFeesCollected: Array.from(collectedFeesIntegrator.values()).map(
-        (value) => ({
-          chainKey: value.chainKey,
-          token: value.token,
-          amount: value.amount.toString(),
-        })
+      integrator: <Address>integratorId,
+      feesCollected: Array.from(chainTokensAmounts.values()).flatMap((tokenMap) =>
+        Array.from(tokenMap.values())
       ),
-      lifiFeesCollected: Array.from(collectedFeesLifi.values()).map((value) => ({
-        chainKey: value.chainKey,
-        token: value.token,
-        amount: value.amount.toString(),
-      })),
     }
   }
   /**

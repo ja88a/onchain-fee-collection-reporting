@@ -1,5 +1,5 @@
 import { ChainKey } from '@lifi/types'
-import { BigNumber } from 'ethers'
+import { Address } from 'viem'
 
 /**
  * Data structure for a parsed FeeCollectedEvent emitted by FeeCollector contracts
@@ -10,22 +10,22 @@ export type FeeCollectedEvent = {
   chainKey: ChainKey
 
   /** Transaction hash in which context the event was emitted */
-  txHash: string
+  txHash: `0x${string}`
 
-  /** Block number, or chain specific tag, when the event was emitted */
-  blockTag: number | string
+  /** Block number (bigint), or chain specific tag, when the event was emitted */
+  blockTag: string
 
   /** Address of the token that was collected */
-  token: string
+  token: Address
 
   /** Address of the integrator that triggered the fee collection */
-  integrator: string
+  integrator: Address
 
   /** the share collected for the integrator */
-  integratorFee: BigNumber
+  integratorFee: bigint
 
   /** the share collected by LI.FI */
-  lifiFee: BigNumber
+  lifiFee: bigint
 
   /** DB document identifier */
   docId?: string

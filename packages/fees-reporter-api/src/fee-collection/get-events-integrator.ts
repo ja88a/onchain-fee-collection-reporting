@@ -5,6 +5,7 @@ import { Factory } from 'hono/factory'
 import { z } from 'zod'
 import { AddressSchemaSpec, ITag } from '../common'
 import { getFeeCollectionEventsByIntegrator } from '@jabba01/lfcr-fees-reporter'
+import { Address } from 'viem'
 
 export function getFeesCollectedEventsByIntegrator<E extends Env, TTag extends ITag>(
   factory: Factory<E>,
@@ -87,8 +88,8 @@ export function getFeesCollectedEventsByIntegrator<E extends Env, TTag extends I
       const { integrator } = c.req.valid('param')
       const { limit, page } = c.req.valid('query')
       const report = await getFeeCollectionEventsByIntegrator(
-        <string>integrator,
-        parseInt(limit) ?? 20,
+        <Address>integrator,
+        parseInt(limit) ?? 50,
         parseInt(page) ?? 0
       )
       return c.json(report, 200)

@@ -1,4 +1,5 @@
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
+import { MSG_EVENTS_SCRAPING_FINISHED } from '@jabba01/lfcr-events-scraper'
 import { ChainKey } from '@lifi/types'
 import { ChildProcessByStdio, spawn } from 'child_process'
 import os from 'os'
@@ -8,7 +9,6 @@ import {
   EventScrapingSessionInitResult,
   ScrapingSessionInitStatus,
 } from './events-scraping.data'
-import { MSG_EVENTS_SCRAPING_FINISHED } from '@jabba01/lfcr-events-scraper/dist/main'
 
 const logger = wLogger.child({
   label: 'EventsScrapingSpawner',

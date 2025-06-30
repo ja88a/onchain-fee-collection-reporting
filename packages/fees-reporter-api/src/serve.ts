@@ -1,11 +1,11 @@
 import { serve } from '@hono/node-server'
-import { logger, MS_CONFIG } from '@jabba01/lfcr-common'
+import { LfcrError, logger, MS_CONFIG } from '@jabba01/lfcr-common'
+import { DatabaseConnector } from '@jabba01/lfcr-database'
 import { openAPISpecs } from 'hono-openapi'
 import { showRoutes } from 'hono/dev'
 import { createFactory } from 'hono/factory'
 import { appConfig, getApp } from './app'
 import { getOpenApiSpec } from './common/openapi'
-import { DatabaseConnector } from '@jabba01/lfcr-database'
 
 const baseApp = getApp(createFactory())
 
@@ -27,8 +27,17 @@ DatabaseConnector.init()
     )
   })
   .catch((error) => {
-    logger.error(`Server stopped: ${error?.stack && error}`, {
-      cause: error,
-    })
+    logger.error(`Server stopped: ${error instanceof LfcrError ? error : error?.stack ?? error}`)
     process.exit(1)
   })
+
+
+// Catch if the Promise is rejected
+process.on('unhandledRejection', (error) => {
+  throw error
+})
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  logger.error(`Uncaught Exception: ${error instanceof LfcrError ? error : error?.stack ?? error}`)
+  process.exit(1)
+})

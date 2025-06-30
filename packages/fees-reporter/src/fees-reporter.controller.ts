@@ -1,18 +1,13 @@
+import { FeeCollectedEvent } from '@jabba01/lfcr-common'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import {
   RESULT_EVENTS_PER_PAGE,
   RESULT_EVENTS_PER_PAGE_MAX,
-  VALIDATE_OUTPUT_COLLECTED_FEES_REPORTS,
 } from './config/service.config'
 import { FeeCollectedEventDto, IntegratorFeesCollectedReport } from './data'
 import { FeeCollectedReportService } from './fees-reporter.service'
 import { FeeCollectionReportError, FeeCollectionReportInputError } from './utils'
-import {
-  createIntegratorFeesCollectedReport,
-  validateIntegratorAccountAddress,
-  validateReport,
-} from './utils/fee-collected-validation'
-import { FeeCollectedEvent } from '@jabba01/lfcr-common'
+import { Address, isAddress } from 'viem'
 
 const logger = wLogger.child({
   label: 'FeeCollectedReportController',
@@ -27,15 +22,14 @@ const logger = wLogger.child({
  * @returns A list of collected fee events associated to the integrator.
  */
 export const reportFeesCollectedByIntegrator = async (
-  integratorAccount: string
+  integratorAccount: Address
 ): Promise<IntegratorFeesCollectedReport> => {
   logger.info(`FeesCollected report requested for integrator '${integratorAccount}'`)
 
   // Validate the input parameters
-  const validationErrors = validateIntegratorAccountAddress(integratorAccount)
-  if (validationErrors.length > 0) {
+  if (!isAddress(integratorAccount)) {
     throw new FeeCollectionReportInputError(
-      `Unsupported integrator ID '${integratorAccount}' requested \n${JSON.stringify(validationErrors)}`
+      `Unsupported integrator account '${integratorAccount}' requested. The account must be a valid hex address.`
     )
   }
 
@@ -43,31 +37,12 @@ export const reportFeesCollectedByIntegrator = async (
   const feesReporterService = new FeeCollectedReportService()
   const report = await feesReporterService
     .reportFeesCollectedByIntegrator(integratorAccount)
-    .catch((error) => {
-      logger.error(
-        `Failed to generate a collected fee report for integrator '${integratorAccount}'. \n${error.stack ?? error}`
-      )
+    .catch((error) => {      
       throw new FeeCollectionReportError(
         `Failed to generate a collected fee report for integrator '${integratorAccount}'.`,
         { cause: error }
       )
     })
-
-  if (VALIDATE_OUTPUT_COLLECTED_FEES_REPORTS) {
-    // Validate the report output
-    const reportInst = createIntegratorFeesCollectedReport(report)
-    await validateReport(reportInst).then((validationErrors) => {
-      if (validationErrors.length > 0) {
-        logger.error(
-          `Failed to generate a valid collected fees report for integrator '${integratorAccount}'. \nValidation Errors: ${JSON.stringify(validationErrors)}`
-        )
-        throw new FeeCollectionReportError(
-          `Report Validation Error: Failed to generate a valid report on collected fees for integrator '${integratorAccount}'`
-        )
-      }
-      return report
-    })
-  }
 
   return report
 }
@@ -81,7 +56,7 @@ export const reportFeesCollectedByIntegrator = async (
  * @returns List of fee collection events associated with the integrator.
  */
 export const getFeeCollectionEventsByIntegrator = async (
-  integratorAccount: string,
+  integratorAccount: Address,
   limit?: number,
   page?: number
 ): Promise<FeeCollectedEventDto[]> => {
@@ -90,10 +65,9 @@ export const getFeeCollectionEventsByIntegrator = async (
   )
 
   // Validate the input parameters
-  const validationErrors = validateIntegratorAccountAddress(integratorAccount)
-  if (validationErrors.length > 0) {
+  if (!isAddress(integratorAccount)) {
     throw new FeeCollectionReportInputError(
-      `Unsupported integrator ID '${integratorAccount}' requested \n${JSON.stringify(validationErrors)}`
+      `Unsupported integrator account '${integratorAccount}' requested. The account must be a valid hex address.`
     )
   }
 
@@ -103,16 +77,13 @@ export const getFeeCollectionEventsByIntegrator = async (
       : limit
     : RESULT_EVENTS_PER_PAGE
 
-  const pageNumber = page ? Number(page) : 0
+  const pageNumber = Number(page) ?? 0
 
   // Retrieve the stored fee collection events
   const feesReporterService = new FeeCollectedReportService()
   const feeCollectionEvents = await feesReporterService
     .getFeeCollectionEventsByIntegrator(integratorAccount, pageLimit, pageNumber)
     .catch((error) => {
-      logger.error(
-        `Failed to get fee collection events for integrator '${integratorAccount}'. \n${error.stack ?? error}`
-      )
       throw new FeeCollectionReportError(
         `Failed to get fee collection events for integrator '${integratorAccount}'.`,
         { cause: error }
@@ -130,18 +101,18 @@ export const getFeeCollectionEventsByIntegrator = async (
 const convertFeeEventsToDto = (
   feeCollectionEvents: FeeCollectedEvent[]
 ): FeeCollectedEventDto[] => {
-  if (!feeCollectionEvents || feeCollectionEvents.length === 0) {
+  if (!(feeCollectionEvents?.length > 0)) {
     return []
   }
   // Convert the fee collection events to DTO format
   return feeCollectionEvents.map((event) => ({
-    chainKey: <string>event.chainKey,
+    chainKey: event.chainKey,
     txHash: event.txHash,
-    blockTag: event.blockTag + '', // Ensure blockTag is a string
+    blockTag: event.blockTag,
     token: event.token,
     integrator: event.integrator,
-    integratorFee: event.integratorFee.toString(),
-    lifiFee: event.lifiFee.toString(),
+    integratorFee: event.integratorFee,
+    lifiFee: event.lifiFee,
     docId: event.docId,
   }))
 }

@@ -1,10 +1,11 @@
+import { reportFeesCollectedByIntegrator } from '@jabba01/lfcr-fees-reporter'
 import { Env } from 'hono'
 import { describeRoute } from 'hono-openapi'
 import { resolver, validator } from 'hono-openapi/zod'
 import { Factory } from 'hono/factory'
+import { Address } from 'viem'
 import { z } from 'zod'
 import { AddressSchemaSpec, Int256, ITag } from '../common'
-import { reportFeesCollectedByIntegrator } from '@jabba01/lfcr-fees-reporter'
 
 export function getFeesCollectedByIntegrator<E extends Env, TTag extends ITag>(
   factory: Factory<E>,
@@ -28,7 +29,7 @@ export function getFeesCollectedByIntegrator<E extends Env, TTag extends ITag>(
                     integrator: z.string().openapi({
                       description: 'Onchain account address of the integrator',
                     }),
-                    integratorFeesCollected: z
+                    feesCollected: z
                       .array(
                         z
                           .object({
@@ -39,48 +40,27 @@ export function getFeesCollectedByIntegrator<E extends Env, TTag extends ITag>(
                             token: z.string().openapi({
                               description: 'Token address of the collected fees',
                             }),
-                            amount: Int256.openapi({
+                            totalIntegrator: Int256.openapi({
                               description:
-                                'Total amount of tokens, a big number expressed in string format',
+                                'Total amount of tokens collected as fees by the integrator, a big number expressed in string format',
+                            }),
+                            totalLifi: Int256.openapi({
+                              description:
+                                'Total amount of tokens collected as fees by the LI.FI protocol, a big number expressed in string format',
                             }),
                           })
                           .openapi({
                             description:
-                              'Fees collected by the integrator on a specific chain',
+                              'Total amounts of the chain-specific token collected as fees by the integrator and the LI.FI protocol.',
                           })
                       )
                       .openapi({
                         description:
-                          'Total fees collected by the integrator per chain and token',
-                      }),
-                    lifiFeesCollected: z
-                      .array(
-                        z
-                          .object({
-                            chainKey: z.string().openapi({
-                              description:
-                                'Chain key where the LiFi protocol share is collected',
-                            }),
-                            token: z.string().openapi({
-                              description: 'Token address of the LiFi protocol share',
-                            }),
-                            amount: Int256.openapi({
-                              description:
-                                'Total amount of tokens, a big number expressed in string format',
-                            }),
-                          })
-                          .openapi({
-                            description:
-                              'LiFi protocol share of the fees collected by the integrator',
-                          })
-                      )
-                      .openapi({
-                        description:
-                          'LiFi protocol share of the fees collected by the integrator per chain and token',
+                          'List of the collected fees, grouped by chain tokens',
                       }),
                   })
                   .openapi({
-                    description: 'Total fees collected by the integrator',
+                    description: 'Report of total fees collected by the integrator',
                   })
               ),
             },
@@ -96,7 +76,7 @@ export function getFeesCollectedByIntegrator<E extends Env, TTag extends ITag>(
     ),
     async (c) => {
       const { integrator } = c.req.valid('param')
-      const report = await reportFeesCollectedByIntegrator(<string>integrator)
+      const report = await reportFeesCollectedByIntegrator(<Address>integrator)
       return c.json(report, 200)
     }
   )

@@ -49,6 +49,7 @@ vi.mock('../models', () => {
 
 // Import mocked modules after mocking
 import { getFeeCollectionEventModel } from '../models'
+import { parseUnits } from 'viem'
 
 describe('FeeCollectedEventStore', () => {
   let service: FeeCollectedEventStore
@@ -71,11 +72,11 @@ describe('FeeCollectedEventStore', () => {
     mockEvent = {
       chainKey: ChainKey.POL,
       txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-      blockTag: 40000000,
+      blockTag: '40000000',
       token: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       integrator: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-      integratorFee: BigNumber.from('1000000000000000000'), // 1 ETH
-      lifiFee: BigNumber.from('100000000000000000'), // 0.1 ETH
+      integratorFee: parseUnits('1000000000000000000', 0), // 1 ETH
+      lifiFee: parseUnits('100000000000000000', 0), // 0.1 ETH
     }
 
     // Create multiple mock events with different txHashes
@@ -84,12 +85,12 @@ describe('FeeCollectedEventStore', () => {
       {
         ...mockEvent,
         txHash: '0x2234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-        blockTag: 40000100,
+        blockTag: '40000100',
       },
       {
         ...mockEvent,
         txHash: '0x3234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-        blockTag: 40000200,
+        blockTag: '40000200',
       },
     ]
   })

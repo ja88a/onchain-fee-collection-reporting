@@ -1,8 +1,9 @@
-import { FeeCollectionEventDoc, getFeeCollectionEventModel } from '../models'
 import { FeeCollectedEvent } from '@jabba01/lfcr-common/dist/data'
 import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { ChainKey } from '@lifi/types'
-import { BigNumber } from 'ethers/lib/ethers'
+import { Address, parseUnits } from 'viem'
+import { DbError } from '../database.utils'
+import { FeeCollectionEventDoc, VersionDefaultFeesCollectedEvent, getFeeCollectionEventModel } from '../models'
 
 /**
  * Service for storing and retrieving FeesCollected events, emitted by the FeeCollector contract, to/from the database
@@ -40,8 +41,9 @@ export class FeeCollectedEventStore {
     return await this.FeeCollectionEventModel.insertMany(dbEntries, {
       ordered: false,
     }).catch((err) => {
-      this.logger.error(
-        `Error met while inserting ${feeCollectedEvents?.length} FeesCollected events in DB: '${err}'`
+      throw new DbError(
+        `Error met while inserting ${feeCollectedEvents?.length} FeesCollected events in DB`,
+        { cause: err }
       )
     })
   }
@@ -87,12 +89,12 @@ const convertToDoc = (feeCollectedEvent: FeeCollectedEvent): FeeCollectionEventD
   return {
     chainKey: feeCollectedEvent.chainKey,
     txHash: feeCollectedEvent.txHash,
-    blockTag: feeCollectedEvent.blockTag,
+    blockTag: feeCollectedEvent.blockTag?.toString(),
     token: feeCollectedEvent.token,
     integrator: feeCollectedEvent.integrator,
-    integratorFee: feeCollectedEvent.integratorFee.toString(),
-    lifiFee: feeCollectedEvent.lifiFee.toString(),
-    schemaVersion: feeCollectedEvent.version,
+    integratorFee: feeCollectedEvent.integratorFee?.toString(),
+    lifiFee: feeCollectedEvent.lifiFee?.toString(),
+    schemaVersion: feeCollectedEvent.version ?? VersionDefaultFeesCollectedEvent,
   }
 }
 
@@ -102,11 +104,11 @@ const convertToEntity = (doc: FeeCollectionEventDoc): FeeCollectedEvent => {
     docId: (doc as any).id,
     version: doc.schemaVersion,
     chainKey: <ChainKey>doc.chainKey,
-    txHash: doc.txHash,
+    txHash: <`0x${string}`>doc.txHash,
     blockTag: doc.blockTag,
-    token: doc.token,
-    integrator: doc.integrator,
-    integratorFee: BigNumber.from(doc.integratorFee),
-    lifiFee: BigNumber.from(doc.lifiFee),
+    token: <Address>doc.token,
+    integrator: <Address>doc.integrator,
+    integratorFee: doc.integratorFee ? parseUnits(doc.integratorFee, 0) : null,
+    lifiFee: doc.lifiFee ? parseUnits(doc.lifiFee, 0) : null,
   }
 }

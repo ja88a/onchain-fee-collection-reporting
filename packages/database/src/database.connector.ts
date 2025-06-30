@@ -71,7 +71,7 @@ export class DatabaseConnector {
    */
   static async close(): Promise<void> {
     await disconnectFromMongoDB().catch((error) => {
-      throw new DbError(`Failed to close database connection.`, { cause: error })
+      throw new DbError(`Failed to disconnect from the database.`, { cause: error })
     })
   }
 }
@@ -147,34 +147,36 @@ export async function connectToMongoDB(
   })
 
   db.on('disconnected', () => {
-    logger.warn('MongoDB disconnected')
+    logger.info('MongoDB disconnected')
   })
 
   db.on('reconnected', () => {
     logger.info('MongoDB reconnected')
   })
 
-  // Handle application interruption & termination
-  const handleAppExit = async () => {
-    logger.debug('MongoDB connection closing due to application termination')
-    await db.close().catch((error) => {
-      logger.error(`Error closing MongoDB connection`, { cause: error })
-    })
-  }
-  process.on('SIGINT', handleAppExit)
-  process.on('SIGTERM', handleAppExit)
-
   return db
+}
+
+/**
+ * Force the closure of mongoose's MongoDB default connection
+ */
+export const closeDbConnection = async (): Promise<void> => {
+  return await mongoose.connection?.close(true).catch((error) => {
+    throw new DbError(`Error while closing MongoDB connection`, { cause: error })
+  }).then(() => {
+    logger.info('MongoDB default connection closed')
+  })
 }
 
 /**
  * Disconnect from MongoDB
  */
-export async function disconnectFromMongoDB(): Promise<void> {
-  await mongoose.disconnect().catch((error) => {
+export const disconnectFromMongoDB = async (): Promise<void> => {
+  return await mongoose.disconnect().catch((error) => {
     throw new DbError(`Error met while disconnecting from MongoDB`, { cause: error })
+  }).then(() => {
+    logger.warn('MongoDB disconnected successfully')
   })
-  logger.info('MongoDB disconnected successfully')
 }
 
 /**

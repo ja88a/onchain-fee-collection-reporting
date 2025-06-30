@@ -27,18 +27,18 @@
     "build": "tsc",
     "build:prod": "tsc -p tsconfig.build.json",
     "build:bundle": "pnpm clean && esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --minify --sourcemap ./src/index.ts",
-    "start": "pnpm build && dotenv -e ../../.env -- node dist/main"
+    "start": "dotenv -e ../../.env -- node dist/main",
+    "start:build": "pnpm -w build && dotenv -e ../../.env -- tsx src/main"
   },
   "dependencies": {
-    "@ethersproject/abstract-provider": "^5.8.0",
     "@jabba01/lfcr-common": "workspace:*",
     "@jabba01/lfcr-database": "workspace:*",
     "@lifi/types": "^17.17.0",
-    "ethers": "^5.8.0",
-    "@jabba01/lfcr-lifi-contract-typings-feecollector": "workspace:*"
+    "viem": "^2.31.3"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/lib-config-typescript": "workspace:*"
+    "@repo/lib-config-typescript": "workspace:*",
+    "ethers": "^5.8.0"
   }
 }

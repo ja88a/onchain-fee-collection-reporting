@@ -2,7 +2,7 @@ import { ChainKey, ChainType } from '@lifi/types'
 import { FeeCollectionConfigStore } from './fee-collection-config-store.service'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
-  EEventScrapingStatus,
+  EScrapingConfigStatus,
   FeeCollectionScrapingConfig,
 } from '@jabba01/lfcr-common/dist/data'
 import { DbError } from '../database.utils'
@@ -78,7 +78,7 @@ describe('FeeCollectionConfigStore', () => {
     mockConfig = {
       version: 1,
       chainKey: ChainKey.POL,
-      status: EEventScrapingStatus.ACTIVE,
+      status: EScrapingConfigStatus.ENABLED,
       chain: {
         id: 137,
         type: ChainType.EVM,
@@ -88,8 +88,8 @@ describe('FeeCollectionConfigStore', () => {
       },
       feeCollector: {
         contract: '0x1231231231231231231231231231231231231231',
-        blockStart: 30_000_000,
-        lastScanBlock: 39_000_000,
+        blockStart: 30_000_000n,
+        lastScanBlock: 39_000_000n,
         lastScanTime: Date.now(),
       },
     }
@@ -115,7 +115,7 @@ describe('FeeCollectionConfigStore', () => {
       expect(mockModel.create).toHaveBeenCalledTimes(1)
       expect(result).toBeDefined()
       expect(result.chainKey).toBe(ChainKey.POL)
-      expect(result.status).toBe(EEventScrapingStatus.ACTIVE)
+      expect(result.status).toBe(EScrapingConfigStatus.ENABLED)
       expect(result.chain.id).toBe(137)
       expect(result.docId).toBeDefined()
     })
@@ -191,7 +191,7 @@ describe('FeeCollectionConfigStore', () => {
         docId: 'mock-id-123'
       }
       
-      const newBlockNumber = 40500000
+      const newBlockNumber = 40_500_000n
       
       // Clone the config to avoid modifying the original
       const updatedConfig = JSON.parse(JSON.stringify(configWithId));
@@ -228,7 +228,7 @@ describe('FeeCollectionConfigStore', () => {
 
       // Act & Assert
       await expect(
-        service.updateFeeCollectorLastScanInfo(configWithId, 40500000)
+        service.updateFeeCollectorLastScanInfo(configWithId, 40_500_000n)
       ).rejects.toThrow(DbError)
       expect(mockModel.findByIdAndUpdate).toHaveBeenCalledTimes(1)
     })
@@ -246,7 +246,7 @@ describe('FeeCollectionConfigStore', () => {
 
       // Act & Assert
       await expect(
-        service.updateFeeCollectorLastScanInfo(configWithId, 40500000)
+        service.updateFeeCollectorLastScanInfo(configWithId, 40_500_000n)
       ).rejects.toThrow(DbError)
       expect(mockModel.findByIdAndUpdate).toHaveBeenCalledTimes(1)
     })
