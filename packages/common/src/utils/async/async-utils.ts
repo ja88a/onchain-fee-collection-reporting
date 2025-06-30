@@ -25,7 +25,7 @@ const locksByName: Record<string, Promise<any>[]> = {}
  */
 export async function doWithLock<T>(
   lockName: string,
-  task: () => Promise<T>,
+  task: () => Promise<T>
 ): Promise<T> {
   if (!locksByName[lockName]) {
     locksByName[lockName] = []

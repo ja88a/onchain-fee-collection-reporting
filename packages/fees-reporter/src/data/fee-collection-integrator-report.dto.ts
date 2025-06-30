@@ -1,5 +1,5 @@
-import { ChainKey } from "@lifi/types"
-import { Address } from "viem/_types"
+import { ChainKey } from '@lifi/types'
+import { Address } from 'viem/_types'
 
 /**
  * Total amount of fees per the chain and token asset

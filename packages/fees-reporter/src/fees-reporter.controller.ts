@@ -37,7 +37,7 @@ export const reportFeesCollectedByIntegrator = async (
   const feesReporterService = new FeeCollectedReportService()
   const report = await feesReporterService
     .reportFeesCollectedByIntegrator(integratorAccount)
-    .catch((error) => {      
+    .catch((error) => {
       throw new FeeCollectionReportError(
         `Failed to generate a collected fee report for integrator '${integratorAccount}'.`,
         { cause: error }

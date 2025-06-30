@@ -11,15 +11,15 @@ import { DbError } from '../database.utils'
 vi.mock('mongoose', () => {
   return {
     connection: {
-      readyState: 1
+      readyState: 1,
     },
     Types: {
       ObjectId: class {
         toString() {
-          return 'mock-object-id';
+          return 'mock-object-id'
         }
-      }
-    }
+      },
+    },
   }
 })
 
@@ -37,22 +37,22 @@ vi.mock('@jabba01/lfcr-common/dist/logger', () => ({
 // Create a chainable query mock
 const createQueryMock = (returnValue) => {
   const queryMock = {
-    exec: vi.fn(() => Promise.resolve(returnValue))
-  };
-  return queryMock;
-};
+    exec: vi.fn(() => Promise.resolve(returnValue)),
+  }
+  return queryMock
+}
 
 // Mock the models
 vi.mock('../models', () => {
   const modelMock = {
     create: vi.fn(),
     findOne: vi.fn(),
-    findByIdAndUpdate: vi.fn()
-  };
-  
+    findByIdAndUpdate: vi.fn(),
+  }
+
   return {
-    getFeeCollectionScrapingConfigModel: () => modelMock
-  };
+    getFeeCollectionScrapingConfigModel: () => modelMock,
+  }
 })
 
 // Import mocked modules after mocking
@@ -67,10 +67,10 @@ describe('FeeCollectionConfigStore', () => {
   beforeEach(() => {
     // Reset all mocks
     vi.resetAllMocks()
-    
+
     // Get reference to mockModel
     mockModel = getFeeCollectionScrapingConfigModel()
-    
+
     // Initialize service
     service = new FeeCollectionConfigStore()
 
@@ -100,9 +100,9 @@ describe('FeeCollectionConfigStore', () => {
       // Arrange
       const mockDoc = {
         id: 'mock-id-123',
-        ...mockConfig
+        ...mockConfig,
       }
-      
+
       mockModel.create.mockResolvedValueOnce(mockDoc)
 
       // Act
@@ -137,9 +137,9 @@ describe('FeeCollectionConfigStore', () => {
       // Arrange
       const mockDoc = {
         id: 'mock-id-123',
-        ...mockConfig
+        ...mockConfig,
       }
-      
+
       mockModel.findOne.mockReturnValueOnce(createQueryMock(mockDoc))
 
       // Act
@@ -169,7 +169,7 @@ describe('FeeCollectionConfigStore', () => {
     it('should handle database errors gracefully', async () => {
       // Arrange
       mockModel.findOne.mockReturnValueOnce({
-        exec: vi.fn().mockRejectedValueOnce(new Error('Database error'))
+        exec: vi.fn().mockRejectedValueOnce(new Error('Database error')),
       })
 
       // Act & Assert
@@ -183,24 +183,27 @@ describe('FeeCollectionConfigStore', () => {
       // Arrange
       const mockDoc = {
         id: 'mock-id-123',
-        ...mockConfig
+        ...mockConfig,
       }
-      
+
       const configWithId = {
         ...mockConfig,
-        docId: 'mock-id-123'
+        docId: 'mock-id-123',
       }
-      
+
       const newBlockNumber = 40_500_000n
-      
+
       // Clone the config to avoid modifying the original
-      const updatedConfig = JSON.parse(JSON.stringify(configWithId));
-      
+      const updatedConfig = JSON.parse(JSON.stringify(configWithId))
+
       // Mock the findByIdAndUpdate to return the original doc (since { new: false } is used)
       mockModel.findByIdAndUpdate.mockReturnValueOnce(createQueryMock(mockDoc))
 
       // Act
-      const result = await service.updateFeeCollectorLastScanInfo(updatedConfig, newBlockNumber)
+      const result = await service.updateFeeCollectorLastScanInfo(
+        updatedConfig,
+        newBlockNumber
+      )
 
       // Assert
       expect(mockModel.findByIdAndUpdate).toHaveBeenCalledTimes(1)
@@ -211,8 +214,10 @@ describe('FeeCollectionConfigStore', () => {
       )
       expect(result).toBeDefined()
       // The original doc is returned since { new: false } is used in findByIdAndUpdate
-      expect(result.feeCollector.lastScanBlock).toBe(mockConfig.feeCollector.lastScanBlock) 
-      
+      expect(result.feeCollector.lastScanBlock).toBe(
+        mockConfig.feeCollector.lastScanBlock
+      )
+
       // Check that the input config was modified
       expect(updatedConfig.feeCollector.lastScanBlock).toBe(newBlockNumber)
     })
@@ -221,9 +226,9 @@ describe('FeeCollectionConfigStore', () => {
       // Arrange
       const configWithId = {
         ...mockConfig,
-        docId: 'mock-id-123'
+        docId: 'mock-id-123',
       }
-      
+
       mockModel.findByIdAndUpdate.mockReturnValueOnce(createQueryMock(null))
 
       // Act & Assert
@@ -237,11 +242,11 @@ describe('FeeCollectionConfigStore', () => {
       // Arrange
       const configWithId = {
         ...mockConfig,
-        docId: 'mock-id-123'
+        docId: 'mock-id-123',
       }
-      
+
       mockModel.findByIdAndUpdate.mockReturnValueOnce({
-        exec: vi.fn().mockRejectedValueOnce(new Error('Database error'))
+        exec: vi.fn().mockRejectedValueOnce(new Error('Database error')),
       })
 
       // Act & Assert
@@ -257,9 +262,9 @@ describe('FeeCollectionConfigStore', () => {
       // Arrange
       const mockDoc = {
         id: 'mock-id-123',
-        ...mockConfig
+        ...mockConfig,
       }
-      
+
       mockModel.findOne.mockReturnValueOnce(createQueryMock(mockDoc))
 
       // Act - getByChain uses convertToEntity internally

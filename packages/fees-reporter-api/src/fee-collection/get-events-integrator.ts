@@ -80,7 +80,8 @@ export function getFeesCollectedEventsByIntegrator<E extends Env, TTag extends I
           description: 'Maximum number of events to return, default size is 20',
         }),
         page: z.string().optional().openapi({
-          description: 'Index of the event result page to start from, considering the set limit, default is 0',
+          description:
+            'Index of the event result page to start from, considering the set limit, default is 0',
         }),
       })
     ),

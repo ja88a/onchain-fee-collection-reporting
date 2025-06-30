@@ -4,7 +4,16 @@ import mongoose from 'mongoose'
 import * as dbConnector from './database.connector'
 import { DatabaseConnector, MongoDBConfig } from './database.connector'
 import { DbError } from './database.utils'
-import { describe, it, expect, beforeAll, afterAll, afterEach, vi, beforeEach } from 'vitest'
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  afterEach,
+  vi,
+  beforeEach,
+} from 'vitest'
 
 // Mock the logger to avoid console output during tests
 vi.mock('@jabba01/lfcr-common/dist/logger', () => ({
@@ -20,7 +29,9 @@ vi.mock('@jabba01/lfcr-common/dist/logger', () => ({
 
 // Workaround: Create mock module for database connector
 vi.mock('./database.connector', async () => {
-  const actual = await vi.importActual('./database.connector') as typeof import('./database.connector')
+  const actual = (await vi.importActual(
+    './database.connector'
+  )) as typeof import('./database.connector')
   return {
     ...actual,
     connectToMongoDB: vi.fn().mockImplementation(actual.connectToMongoDB),
@@ -94,7 +105,7 @@ describe('DatabaseConnector', () => {
 
       // Arrange - first connect
       await dbConnector.connectToMongoDB(validConfig)
-      
+
       // Skip this test if we couldn't connect properly
       if (mongoose.connection.readyState === 0) {
         return
@@ -103,7 +114,7 @@ describe('DatabaseConnector', () => {
       // Act
       await dbConnector.disconnectFromMongoDB()
 
-      // Assert - we're testing the function completes successfully 
+      // Assert - we're testing the function completes successfully
       // The actual state might vary in tests due to async nature
       expect(true).toBe(true)
     }, 10000)
@@ -111,7 +122,7 @@ describe('DatabaseConnector', () => {
     it('should throw DbError when disconnect fails', async () => {
       // This test is difficult to set up correctly in Vitest, so we'll skip it
       // The implementation still handles errors correctly
-      
+
       // Instead, we'll test for basic completion without actual error
       expect(true).toBe(true)
     }, 10000)
@@ -135,7 +146,7 @@ describe('DatabaseConnector', () => {
         // Act & Assert - use simplified approach
         let threwError = false
         let caughtError: any = null
-        
+
         try {
           await DatabaseConnector.init(validConfig)
         } catch (error) {
@@ -145,7 +156,7 @@ describe('DatabaseConnector', () => {
           // Clean up
           connectSpy.mockRestore()
         }
-        
+
         // Verify error was thrown and is the right type
         expect(threwError).toBe(true)
         expect(caughtError).toBeInstanceOf(DbError)

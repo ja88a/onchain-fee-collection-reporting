@@ -27,7 +27,7 @@ export function postScrapFeesCollectedOnChain<E extends Env, TTag extends ITag>(
           description: 'Result of the events scraping session initiation.',
           content: {
             'application/json': {
-              schema: EventScrapingSessionInitResultSchemaSpec
+              schema: EventScrapingSessionInitResultSchemaSpec,
             },
           },
         },

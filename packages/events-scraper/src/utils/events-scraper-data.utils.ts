@@ -1,4 +1,4 @@
-import { ChainKey } from "@lifi/types"
+import { ChainKey } from '@lifi/types'
 
 /** Message indicating the completion of the events scraping session */
 export const MSG_EVENTS_SCRAPING_FINISHED = 'Events scraping session finished'

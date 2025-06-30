@@ -1,4 +1,4 @@
-import { parseAbiItem } from "viem"
+import { parseAbiItem } from 'viem'
 
 const ABI_FEE_COLLECTOR_V1 = [
   {
@@ -180,6 +180,12 @@ const ABI_FEE_COLLECTOR_V1 = [
   },
 ]
 
-export const abiFeesCollectedEvent = [ABI_FEE_COLLECTOR_V1.find((entry) => entry.name === 'FeesCollected')]
+export const abiFeesCollectedEvent = [
+  ABI_FEE_COLLECTOR_V1.find((entry) => entry.name === 'FeesCollected'),
+]
 
-export const abiEventFeesCollected = [parseAbiItem('event FeesCollected(address indexed _token, address indexed _integrator, uint256 _integratorFee, uint256 _lifiFee)')]
+export const abiEventFeesCollected = [
+  parseAbiItem(
+    'event FeesCollected(address indexed _token, address indexed _integrator, uint256 _integratorFee, uint256 _lifiFee)'
+  ),
+]

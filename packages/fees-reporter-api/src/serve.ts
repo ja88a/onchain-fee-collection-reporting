@@ -27,10 +27,11 @@ DatabaseConnector.init()
     )
   })
   .catch((error) => {
-    logger.error(`Server stopped: ${error instanceof LfcrError ? error : error?.stack ?? error}`)
+    logger.error(
+      `Server stopped: ${error instanceof LfcrError ? error : (error?.stack ?? error)}`
+    )
     process.exit(1)
   })
-
 
 // Catch if the Promise is rejected
 process.on('unhandledRejection', (error) => {
@@ -38,6 +39,8 @@ process.on('unhandledRejection', (error) => {
 })
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  logger.error(`Uncaught Exception: ${error instanceof LfcrError ? error : error?.stack ?? error}`)
+  logger.error(
+    `Uncaught Exception: ${error instanceof LfcrError ? error : (error?.stack ?? error)}`
+  )
   process.exit(1)
 })

@@ -467,9 +467,7 @@ describe('FeeCollectionEventScraper', () => {
       mockProvider.getBlock.mockRejectedValue(new Error('RPC error'))
 
       // Execute and verify
-      await expect(
-        scraper.getChainLastBlock(mockChainConfig, 2)
-      ).rejects.toThrow(
+      await expect(scraper.getChainLastBlock(mockChainConfig, 2)).rejects.toThrow(
         expect.objectContaining({
           message: expect.stringContaining('Failed to retrieve last block number'),
         })
@@ -672,7 +670,7 @@ describe('FeeCollectionEventScraper', () => {
       // Execute the method
       const result = await scraper['extractAndStoreBlockEvents'](
         mockChainConfig,
-        mockLastBlockNumber,
+        mockLastBlockNumber
       )
 
       // Verify the result
@@ -700,7 +698,7 @@ describe('FeeCollectionEventScraper', () => {
       // Execute the method
       const result = await scraper['extractAndStoreBlockEvents'](
         mockChainConfig,
-        mockLastBlockNumber,
+        mockLastBlockNumber
       )
 
       // Verify the result

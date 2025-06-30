@@ -161,22 +161,28 @@ export async function connectToMongoDB(
  * Force the closure of mongoose's MongoDB default connection
  */
 export const closeDbConnection = async (): Promise<void> => {
-  return await mongoose.connection?.close(true).catch((error) => {
-    throw new DbError(`Error while closing MongoDB connection`, { cause: error })
-  }).then(() => {
-    logger.info('MongoDB default connection closed')
-  })
+  return await mongoose.connection
+    ?.close(true)
+    .catch((error) => {
+      throw new DbError(`Error while closing MongoDB connection`, { cause: error })
+    })
+    .then(() => {
+      logger.info('MongoDB default connection closed')
+    })
 }
 
 /**
  * Disconnect from MongoDB
  */
 export const disconnectFromMongoDB = async (): Promise<void> => {
-  return await mongoose.disconnect().catch((error) => {
-    throw new DbError(`Error met while disconnecting from MongoDB`, { cause: error })
-  }).then(() => {
-    logger.warn('MongoDB disconnected successfully')
-  })
+  return await mongoose
+    .disconnect()
+    .catch((error) => {
+      throw new DbError(`Error met while disconnecting from MongoDB`, { cause: error })
+    })
+    .then(() => {
+      logger.warn('MongoDB disconnected successfully')
+    })
 }
 
 /**

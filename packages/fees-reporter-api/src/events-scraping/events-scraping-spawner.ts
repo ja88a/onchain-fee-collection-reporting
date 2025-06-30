@@ -21,7 +21,7 @@ const indexPath = path.resolve(
 )
 
 /** Pattern to match in the logs */
-const syncedPattern = new RegExp(String.raw`\s${MSG_EVENTS_SCRAPING_FINISHED}.*\s`, "g");
+const syncedPattern = new RegExp(String.raw`\s${MSG_EVENTS_SCRAPING_FINISHED}.*\s`, 'g')
 
 // Get the number of logical CPU cores
 // Use a maximum of 50% of the available CPU cores
@@ -45,7 +45,9 @@ export const stopEventScrapingProcess = (chainKey?: ChainKey) => {
   if (!chainKey) {
     const chainKeys = Array.from(eventsScrapingProcesses.keys())
     if (chainKeys?.length > 0) {
-      logger.warn(`Stopping all registered event scraping sessions on chains '${chainKeys}'`)
+      logger.warn(
+        `Stopping all registered event scraping sessions on chains '${chainKeys}'`
+      )
       chainKeys.forEach((key) => stopEventScrapingProcess(key))
     }
   }
@@ -170,4 +172,3 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   stopEventScrapingProcess()
 })
-

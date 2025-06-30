@@ -64,6 +64,7 @@ export class FeeCollectedReportService {
       ),
     }
   }
+
   /**
    * Retrieve the FeeCollected events for a given integrator
    * from the persistence layer.

@@ -3,7 +3,11 @@ import { logger as wLogger } from '@jabba01/lfcr-common/dist/logger'
 import { ChainKey } from '@lifi/types'
 import { Address, parseUnits } from 'viem'
 import { DbError } from '../database.utils'
-import { FeeCollectionEventDoc, VersionDefaultFeesCollectedEvent, getFeeCollectionEventModel } from '../models'
+import {
+  FeeCollectionEventDoc,
+  VersionDefaultFeesCollectedEvent,
+  getFeeCollectionEventModel,
+} from '../models'
 
 /**
  * Service for storing and retrieving FeesCollected events, emitted by the FeeCollector contract, to/from the database

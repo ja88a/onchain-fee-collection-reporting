@@ -80,7 +80,8 @@ export class FeeCollectionEventScraper {
 
     if (chainKey) {
       // If the chainKey is provided, change the state for that specific chain
-      const currentState = this.scrapingProcessState.get(chainKey) || EEventScrapingState.STOPPED
+      const currentState =
+        this.scrapingProcessState.get(chainKey) || EEventScrapingState.STOPPED
       if (EventScrapingStateNext.get(currentState)?.includes(newState))
         this.scrapingProcessState.set(chainKey, newState)
       else {
@@ -114,8 +115,12 @@ export class FeeCollectionEventScraper {
    * @param chainKey the unique LI.FI key of the target blockchain hosting the LI.FI FeeCollector contract. If not provided, all scraping processes will be stopped.
    */
   stopScrapingSession(event: string, chainKey?: ChainKey): void {
-    const currentState = chainKey ? this.scrapingProcessState.get(chainKey) : EEventScrapingState.RUNNING
-    this.logger.debug(`Stopping scraping session${chainKey ? ` for chain '${chainKey}' (${currentState})` : 'es'} on event '${event}'`)
+    const currentState = chainKey
+      ? this.scrapingProcessState.get(chainKey)
+      : EEventScrapingState.RUNNING
+    this.logger.debug(
+      `Stopping scraping session${chainKey ? ` for chain '${chainKey}' (${currentState})` : 'es'} on event '${event}'`
+    )
     if (currentState === EEventScrapingState.RUNNING) {
       this.changeScrapingProcessState(event, EEventScrapingState.STOPPING, chainKey)
     }
@@ -123,7 +128,7 @@ export class FeeCollectionEventScraper {
 
   /**
    * Retrieves the current state of local scraping processes, for all chains.
-   * 
+   *
    * @returns a Map of ChainKey to EEventScrapingState representing the ongoing scraping sessions
    */
   getOngoingChainScrapingSessions(): Map<ChainKey, EEventScrapingState> {

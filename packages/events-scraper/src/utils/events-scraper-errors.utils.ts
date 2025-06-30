@@ -1,8 +1,11 @@
-import { ErrorOptionsCustom, HttpStatusCode, LfcrError } from "@jabba01/lfcr-common"
+import { ErrorOptionsCustom, HttpStatusCode, LfcrError } from '@jabba01/lfcr-common'
 
 export class EventScrapingError extends LfcrError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, { ...options, status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR })
+    super(message, {
+      ...options,
+      status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR,
+    })
     this.name = EventScrapingError.name
   }
 }
@@ -12,7 +15,10 @@ export class EventScrapingError extends LfcrError {
  */
 export class EventScrapingTimeoutError extends EventScrapingError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, { ...options, status: options?.status ?? HttpStatusCode.GATEWAY_TIMEOUT })
+    super(message, {
+      ...options,
+      status: options?.status ?? HttpStatusCode.GATEWAY_TIMEOUT,
+    })
     this.name = EventScrapingTimeoutError.name
   }
 }
@@ -22,7 +28,10 @@ export class EventScrapingTimeoutError extends EventScrapingError {
  */
 export class EventScrapingDatabaseError extends EventScrapingError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, { ...options, status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR })
+    super(message, {
+      ...options,
+      status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR,
+    })
     this.name = EventScrapingDatabaseError.name
   }
 }
@@ -42,7 +51,10 @@ export class EventScrapingInputError extends EventScrapingError {
  */
 export class EventScrapingStatusError extends EventScrapingError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, { ...options, status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR })
+    super(message, {
+      ...options,
+      status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR,
+    })
     this.name = EventScrapingStatusError.name
   }
 }
@@ -52,7 +64,10 @@ export class EventScrapingStatusError extends EventScrapingError {
  */
 export class EventScrapingChainError extends EventScrapingError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, { ...options, status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR })
+    super(message, {
+      ...options,
+      status: options?.status ?? HttpStatusCode.INTERNAL_SERVER_ERROR,
+    })
     this.name = EventScrapingChainError.name
   }
 }

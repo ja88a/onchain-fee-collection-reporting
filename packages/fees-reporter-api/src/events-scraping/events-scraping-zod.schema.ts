@@ -1,6 +1,9 @@
 import { resolver } from 'hono-openapi/zod'
 import z from 'zod'
-import { EventScrapingSessionInitResult, ScrapingSessionInitStatus } from './events-scraping.data'
+import {
+  EventScrapingSessionInitResult,
+  ScrapingSessionInitStatus,
+} from './events-scraping.data'
 import { ChainKey } from '@lifi/types'
 
 export const ScrapingSessionResultSchemaSpec = resolver(
@@ -31,7 +34,8 @@ export const EventScrapingSessionInitResultSchemaSpec = resolver(
         description: 'The chain key for which the scraping session was initiated',
       }),
       message: z.string().openapi({
-        description: 'Free text message providing information about the scraping session initiation',
+        description:
+          'Free text message providing information about the scraping session initiation',
       }),
     })
     .openapi({

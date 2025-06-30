@@ -24,7 +24,7 @@ class ChainPropertiesDoc {
   public rpcUrl!: string
 
   /** Optional private API key for the RPC provider */
-  @prop({ required: false})
+  @prop({ required: false })
   public rpcKey?: string
 
   /** the chain specific tag enabling to get its last block number */
@@ -61,7 +61,10 @@ class FeeCollectorPropertiesDoc {
  * Schema of the FeeCollector's blockchain configuration document
  */
 @modelOptions({
-  schemaOptions: { collection: 'FeeCollectionOnchainConfig', versionKey: 'schemaVersion' },
+  schemaOptions: {
+    collection: 'FeeCollectionOnchainConfig',
+    versionKey: 'schemaVersion',
+  },
   options: { disableCaching: false },
 })
 export class FeeCollectionScrapingConfigDoc extends TimeStamps {

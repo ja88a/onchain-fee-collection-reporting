@@ -1,4 +1,4 @@
-import { ErrorOptionsCustom, LfcrError } from "@jabba01/lfcr-common"
+import { ErrorOptionsCustom, LfcrError } from '@jabba01/lfcr-common'
 
 /**
  * Error thrown when a fee collection report scraping session fails.
@@ -15,7 +15,7 @@ export class FeeCollectionReportError extends LfcrError {
  */
 export class FeeCollectionReportDatabaseError extends FeeCollectionReportError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, {...options, status: options?.status ?? 500})
+    super(message, { ...options, status: options?.status ?? 500 })
     this.name = 'FeeCollectionReportDatabaseError'
   }
 }
@@ -25,7 +25,7 @@ export class FeeCollectionReportDatabaseError extends FeeCollectionReportError {
  */
 export class FeeCollectionReportInputError extends FeeCollectionReportError {
   constructor(message: string, options?: ErrorOptionsCustom) {
-    super(message, {...options, status: options?.status ?? 400})
+    super(message, { ...options, status: options?.status ?? 400 })
     this.name = 'FeeCollectionReportInputError'
   }
 }

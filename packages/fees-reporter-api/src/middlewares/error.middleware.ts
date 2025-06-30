@@ -25,7 +25,9 @@ function extractCode(err: Error) {
 
 export function createErrorHandler<E extends Env>(_factory: Factory<E>): ErrorHandler<E> {
   return (err, c) => {
-    logger.error(`Internal Server Error \n${err instanceof LfcrError ? err : err?.stack ?? err}`)
+    logger.error(
+      `Internal Server Error \n${err instanceof LfcrError ? err : (err?.stack ?? err)}`
+    )
     return c.json(createErrorResponse(err), extractCode(err))
   }
 }
@@ -34,8 +36,10 @@ export const errorHandler = async (c: Context, next: Next) => {
   try {
     await next()
   } catch (err) {
-    logger.error(`Internal Server Error \n${err instanceof LfcrError ? err : err?.['stack'] ?? err}`)
+    logger.error(
+      `Internal Server Error \n${err instanceof LfcrError ? err : (err?.['stack'] ?? err)}`
+    )
     c.status(extractCode(<Error>err))
-    c.json(createErrorResponse(err))
+    return c.json(createErrorResponse(err))
   }
 }

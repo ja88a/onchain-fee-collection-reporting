@@ -8,8 +8,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 vi.mock('mongoose', () => {
   return {
     connection: {
-      readyState: 1
-    }
+      readyState: 1,
+    },
   }
 })
 
@@ -29,22 +29,22 @@ const createQueryMock = (returnValue) => {
   const queryMock = {
     skip: vi.fn(() => queryMock),
     limit: vi.fn(() => queryMock),
-    sort: vi.fn(() => returnValue)
-  };
-  return queryMock;
-};
+    sort: vi.fn(() => returnValue),
+  }
+  return queryMock
+}
 
 // Mock the models
 vi.mock('../models', () => {
   const modelMock = {
     create: vi.fn(),
     insertMany: vi.fn(),
-    find: vi.fn()
-  };
-  
+    find: vi.fn(),
+  }
+
   return {
-    getFeeCollectionEventModel: () => modelMock
-  };
+    getFeeCollectionEventModel: () => modelMock,
+  }
 })
 
 // Import mocked modules after mocking
@@ -61,10 +61,10 @@ describe('FeeCollectedEventStore', () => {
   beforeEach(() => {
     // Reset all mocks
     vi.resetAllMocks()
-    
+
     // Get reference to mockModel
     mockModel = getFeeCollectionEventModel()
-    
+
     // Initialize service
     service = new FeeCollectedEventStore()
 
@@ -107,7 +107,7 @@ describe('FeeCollectedEventStore', () => {
         integratorFee: mockEvent.integratorFee.toString(),
         lifiFee: mockEvent.lifiFee.toString(),
       }
-      
+
       mockModel.create.mockResolvedValueOnce(mockDoc)
 
       // Act
@@ -166,7 +166,7 @@ describe('FeeCollectedEventStore', () => {
           lifiFee: mockEvents[2].lifiFee.toString(),
         },
       ]
-      
+
       mockModel.insertMany.mockResolvedValueOnce(mockDocs)
 
       // Act
@@ -174,7 +174,9 @@ describe('FeeCollectedEventStore', () => {
 
       // Assert
       expect(mockModel.insertMany).toHaveBeenCalledTimes(1)
-      expect(mockModel.insertMany).toHaveBeenCalledWith(expect.any(Array), { ordered: false })
+      expect(mockModel.insertMany).toHaveBeenCalledWith(expect.any(Array), {
+        ordered: false,
+      })
       expect(result).toBeDefined()
       expect(Array.isArray(result)).toBe(true)
       expect(result).toHaveLength(3)
@@ -199,7 +201,7 @@ describe('FeeCollectedEventStore', () => {
   describe('retrieveFeeCollectedEventsByIntegrator', () => {
     it('should retrieve all events for an integrator without pagination', async () => {
       // Arrange
-      const mockEntities = mockEvents.map(event => ({
+      const mockEntities = mockEvents.map((event) => ({
         id: 'mock-id-' + event.txHash.substring(0, 6),
         chainKey: event.chainKey,
         txHash: event.txHash,
@@ -209,7 +211,7 @@ describe('FeeCollectedEventStore', () => {
         integratorFee: event.integratorFee.toString(),
         lifiFee: event.lifiFee.toString(),
       }))
-      
+
       // Setup the chainable mock for the case without pagination
       mockModel.find.mockReturnValueOnce(createQueryMock(mockEntities))
 
@@ -228,12 +230,14 @@ describe('FeeCollectedEventStore', () => {
       // Check that all properties are converted correctly
       expect(result[0].chainKey).toBe(mockEvents[0].chainKey)
       expect(result[0].txHash).toBe(mockEvents[0].txHash)
-      expect(result[0].integratorFee.toString()).toBe(mockEvents[0].integratorFee.toString())
+      expect(result[0].integratorFee.toString()).toBe(
+        mockEvents[0].integratorFee.toString()
+      )
     })
 
     it('should retrieve events with pagination', async () => {
       // Arrange
-      const mockEntities = mockEvents.slice(0, 2).map(event => ({
+      const mockEntities = mockEvents.slice(0, 2).map((event) => ({
         id: 'mock-id-' + event.txHash.substring(0, 6),
         chainKey: event.chainKey,
         txHash: event.txHash,
@@ -243,7 +247,7 @@ describe('FeeCollectedEventStore', () => {
         integratorFee: event.integratorFee.toString(),
         lifiFee: event.lifiFee.toString(),
       }))
-      
+
       // Setup the chainable mock for the case with pagination
       mockModel.find.mockReturnValueOnce(createQueryMock(mockEntities))
 
@@ -260,9 +264,9 @@ describe('FeeCollectedEventStore', () => {
       expect(result).toBeDefined()
       expect(Array.isArray(result)).toBe(true)
       expect(result.length).toBe(2)
-      
+
       // Verify that chainable methods were called with correct parameters
-      const queryMock = mockModel.find.mock.results[0].value;
+      const queryMock = mockModel.find.mock.results[0].value
       expect(queryMock.skip).toHaveBeenCalledWith(0)
       expect(queryMock.limit).toHaveBeenCalledWith(2)
       expect(queryMock.sort).toHaveBeenCalledWith({ blockTag: 'desc' })
@@ -270,7 +274,7 @@ describe('FeeCollectedEventStore', () => {
 
     it('should retrieve events with offset', async () => {
       // Arrange
-      const mockEntities = mockEvents.slice(1, 3).map(event => ({
+      const mockEntities = mockEvents.slice(1, 3).map((event) => ({
         id: 'mock-id-' + event.txHash.substring(0, 6),
         chainKey: event.chainKey,
         txHash: event.txHash,
@@ -280,7 +284,7 @@ describe('FeeCollectedEventStore', () => {
         integratorFee: event.integratorFee.toString(),
         lifiFee: event.lifiFee.toString(),
       }))
-      
+
       // Setup the chainable mock for the case with pagination and offset
       mockModel.find.mockReturnValueOnce(createQueryMock(mockEntities))
 
@@ -297,9 +301,9 @@ describe('FeeCollectedEventStore', () => {
       expect(result).toBeDefined()
       expect(Array.isArray(result)).toBe(true)
       expect(result.length).toBe(2)
-      
+
       // Verify that chainable methods were called with correct parameters
-      const queryMock = mockModel.find.mock.results[0].value;
+      const queryMock = mockModel.find.mock.results[0].value
       expect(queryMock.skip).toHaveBeenCalledWith(1)
       expect(queryMock.limit).toHaveBeenCalledWith(2)
       expect(queryMock.sort).toHaveBeenCalledWith({ blockTag: 'desc' })
@@ -316,8 +320,8 @@ describe('FeeCollectedEventStore', () => {
 
       // Assert
       expect(mockModel.find).toHaveBeenCalledTimes(1)
-      expect(mockModel.find).toHaveBeenCalledWith({ 
-        integrator: '0xcccccccccccccccccccccccccccccccccccccccc' 
+      expect(mockModel.find).toHaveBeenCalledWith({
+        integrator: '0xcccccccccccccccccccccccccccccccccccccccc',
       })
       expect(result).toBeDefined()
       expect(Array.isArray(result)).toBe(true)
@@ -351,10 +355,10 @@ describe('FeeCollectedEventStore', () => {
         integratorFee: mockEvent.integratorFee.toString(),
         lifiFee: mockEvent.lifiFee.toString(),
       }
-      
+
       // Mock for creating the event
       mockModel.create.mockResolvedValueOnce(mockDoc)
-      
+
       // Mock for retrieving the event
       mockModel.find.mockReturnValueOnce(createQueryMock([mockDoc]))
 
@@ -377,7 +381,7 @@ describe('FeeCollectedEventStore', () => {
       )
       expect(retrievedEntity.lifiFee.toString()).toBe(mockEvent.lifiFee.toString())
       expect(retrievedEntity.docId).toBeDefined()
-      
+
       // Verify mock calls
       expect(mockModel.create).toHaveBeenCalledTimes(1)
       expect(mockModel.find).toHaveBeenCalledTimes(1)
