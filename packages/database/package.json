@@ -34,7 +34,8 @@
     "@lifi/types": "^17.17.0",
     "@typegoose/typegoose": "^12.16.0",
     "ethers": "^5.8.0",
-    "mongoose": "^8.15.1"
+    "mongoose": "^8.15.1",
+    "viem": "^2.31.3"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

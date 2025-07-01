@@ -3,8 +3,8 @@ import {
   CHAIN_SCAN_BLOCKS_BATCH_SIZE,
 } from '@jabba01/lfcr-common/dist/config'
 import {
-  EEventScrapingStatus,
-  FeeCollectedEventParsed,
+  EScrapingConfigStatus,
+  FeeCollectedEvent,
   FeeCollectionScrapingConfig,
 } from '@jabba01/lfcr-common/dist/data'
 import { ChainKey } from '@lifi/types'
@@ -32,15 +32,6 @@ vi.mock('@jabba01/lfcr-database', () => {
   }
 })
 
-// Mock the lifi contract typings
-vi.mock('@jabba01/lfcr-lifi-contract-typings-feecollector/dist/FeeCollector', () => {
-  return {
-    FeeCollector__factory: {
-      createInterface: vi.fn().mockReturnValue({}),
-    },
-  }
-})
-
 describe('FeeCollectionEventScraper', () => {
   let scraper: FeeCollectionEventScraper
   let mongoServer: MongoMemoryServer
@@ -52,9 +43,9 @@ describe('FeeCollectionEventScraper', () => {
 
   // Config values
   const mockChainKey = ChainKey.POL
-  const mockLastBlockNumber = 12345678
-  const mockLastScannedBlock = 12345000
-  const mockStartBlock = 12345000 // Same as lastScannedBlock to test edge case
+  const mockLastBlockNumber = BigInt(12345678)
+  const mockLastScannedBlock = BigInt(12345000)
+  const mockStartBlock = BigInt(12345000) // Same as lastScannedBlock to test edge case
   const mockContractAddress = '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9'
   const mockRpcUrl = 'https://polygon-rpc.com'
 
@@ -93,36 +84,37 @@ describe('FeeCollectionEventScraper', () => {
   ]
 
   // Mock parsed events
-  const mockParsedEvents: FeeCollectedEventParsed[] = [
+  const mockParsedEvents: FeeCollectedEvent[] = [
     {
       chainKey: mockChainKey,
       txHash: '0x123456',
-      blockTag: 12345001,
+      blockTag: '12345001',
       token: '0xTokenAddress1',
       integrator: '0xIntegratorAddress1',
-      integratorFee: BigNumber.from('1000000'),
-      lifiFee: BigNumber.from('500000'),
+      integratorFee: BigInt('1000000'),
+      lifiFee: BigInt('500000'),
     },
     {
       chainKey: mockChainKey,
       txHash: '0x789012',
-      blockTag: 12345001,
+      blockTag: '12345001',
       token: '0xTokenAddress2',
       integrator: '0xIntegratorAddress2',
-      integratorFee: BigNumber.from('2000000'),
-      lifiFee: BigNumber.from('1000000'),
+      integratorFee: BigInt('2000000'),
+      lifiFee: BigInt('1000000'),
     },
   ]
 
   // Mock chain configuration
   const mockChainConfig: FeeCollectionScrapingConfig = {
     chainKey: mockChainKey,
-    status: EEventScrapingStatus.ACTIVE,
+    status: EScrapingConfigStatus.ENABLED,
     chain: {
       id: 137, // Polygon Mainnet
       type: 'EVM',
       rpcUrl: mockRpcUrl,
       lastBlockTag: CHAIN_LATEST_BLOCK_TAG,
+      blockBatchSize: CHAIN_SCAN_BLOCKS_BATCH_SIZE,
     },
     feeCollector: {
       contract: mockContractAddress,
@@ -223,7 +215,7 @@ describe('FeeCollectionEventScraper', () => {
       )
 
       // Execute the method
-      const result = await scraper.scrapFeeCollectorEvents(mockChainKey)
+      const result = await scraper.startScrapingSession(mockChainKey)
 
       // Verify the result
       expect(result).toEqual({
@@ -256,7 +248,7 @@ describe('FeeCollectionEventScraper', () => {
       // Setup inactive config
       const inactiveConfig = {
         ...mockChainConfig,
-        status: EEventScrapingStatus.INACTIVE,
+        status: EScrapingConfigStatus.DISABLED,
       }
 
       // Mock getByChain to return inactive config
@@ -265,7 +257,7 @@ describe('FeeCollectionEventScraper', () => {
       )
 
       // Execute the method
-      const result = await scraper.scrapFeeCollectorEvents(mockChainKey)
+      const result = await scraper.startScrapingSession(mockChainKey)
 
       // Verify the result
       expect(result).toEqual({
@@ -301,7 +293,7 @@ describe('FeeCollectionEventScraper', () => {
       })
 
       // Execute the method
-      const result = await scraper.scrapFeeCollectorEvents(mockChainKey)
+      const result = await scraper.startScrapingSession(mockChainKey)
 
       // Verify the result
       expect(result).toEqual({
@@ -345,7 +337,7 @@ describe('FeeCollectionEventScraper', () => {
       })
 
       // Execute the method
-      const result = await scraper.scrapFeeCollectorEvents(mockChainKey)
+      const result = await scraper.startScrapingSession(mockChainKey)
 
       // Verify createFeeCollectorEventScrapingConfig was called
       expect(
@@ -367,7 +359,7 @@ describe('FeeCollectionEventScraper', () => {
       )
 
       // Execute and verify
-      await expect(scraper.scrapFeeCollectorEvents(mockChainKey)).rejects.toThrow(
+      await expect(scraper.startScrapingSession(mockChainKey)).rejects.toThrow(
         expect.objectContaining({
           message: expect.stringContaining(
             'Failed to retrieve the FeeCollector Scraping Config'
@@ -386,10 +378,10 @@ describe('FeeCollectionEventScraper', () => {
       mockContract.queryFilter.mockRejectedValue(new Error('RPC error'))
 
       // Execute and verify
-      await expect(scraper.scrapFeeCollectorEvents(mockChainKey)).rejects.toThrow(
+      await expect(scraper.startScrapingSession(mockChainKey)).rejects.toThrow(
         EventScrapingError
       )
-      await expect(scraper.scrapFeeCollectorEvents(mockChainKey)).rejects.toThrow(
+      await expect(scraper.startScrapingSession(mockChainKey)).rejects.toThrow(
         expect.objectContaining({
           message: expect.stringContaining(
             'Failed to extract and store events from chain'
@@ -402,7 +394,7 @@ describe('FeeCollectionEventScraper', () => {
   describe('getChainLastBlock', () => {
     it('should return the last block number and tag', async () => {
       // Execute the method
-      const result = await scraper.getChainLastBlock(mockChainConfig, mockContract)
+      const result = await scraper.getChainLastBlock(mockChainConfig)
 
       // Verify the result
       expect(result).toEqual({
@@ -475,9 +467,7 @@ describe('FeeCollectionEventScraper', () => {
       mockProvider.getBlock.mockRejectedValue(new Error('RPC error'))
 
       // Execute and verify
-      await expect(
-        scraper.getChainLastBlock(mockChainConfig, mockContract, 2)
-      ).rejects.toThrow(
+      await expect(scraper.getChainLastBlock(mockChainConfig, 2)).rejects.toThrow(
         expect.objectContaining({
           message: expect.stringContaining('Failed to retrieve last block number'),
         })
@@ -488,7 +478,7 @@ describe('FeeCollectionEventScraper', () => {
     })
   })
 
-  describe('retrieveFeeCollectionConfig', () => {
+  describe('retrieveChainScrapingConfig', () => {
     it('should retrieve config from database if it exists', async () => {
       // Setup mock
       vi.spyOn(scraper['dbFeeCollectionConfig'], 'getByChain').mockResolvedValue(
@@ -496,7 +486,7 @@ describe('FeeCollectionEventScraper', () => {
       )
 
       // Execute the method
-      const result = await scraper.retrieveFeeCollectionConfig(mockChainKey)
+      const result = await scraper.retrieveChainScrapingConfig(mockChainKey)
 
       // Verify the result
       expect(result).toEqual(mockChainConfig)
@@ -523,7 +513,7 @@ describe('FeeCollectionEventScraper', () => {
       ).mockResolvedValue(mockChainConfig)
 
       // Execute the method
-      const result = await scraper.retrieveFeeCollectionConfig(mockChainKey)
+      const result = await scraper.retrieveChainScrapingConfig(mockChainKey)
 
       // Verify the result
       expect(result).toEqual(mockChainConfig)
@@ -544,7 +534,7 @@ describe('FeeCollectionEventScraper', () => {
       const unknownChainKey = 'UNKNOWN' as ChainKey
 
       // Execute and verify
-      await expect(scraper.retrieveFeeCollectionConfig(unknownChainKey)).rejects.toThrow(
+      await expect(scraper.retrieveChainScrapingConfig(unknownChainKey)).rejects.toThrow(
         expect.objectContaining({
           message: expect.stringContaining(
             'No configuration found for scraping FeeCollector events'
@@ -561,8 +551,9 @@ describe('FeeCollectionEventScraper', () => {
 
       // Execute the method
       const result = await scraper['loadFeeCollectorEvents'](
+        mockChainKey,
         mockContract,
-        mockLastScannedBlock + 1,
+        mockLastScannedBlock + 1n,
         mockLastBlockNumber
       )
 
@@ -572,7 +563,7 @@ describe('FeeCollectionEventScraper', () => {
       // Verify queryFilter was called with correct parameters
       expect(mockContract.queryFilter).toHaveBeenCalledWith(
         {},
-        mockLastScannedBlock + 1,
+        mockLastScannedBlock + 1n,
         mockLastBlockNumber
       )
     })
@@ -585,8 +576,9 @@ describe('FeeCollectionEventScraper', () => {
 
       // Execute the method
       const result = await scraper['loadFeeCollectorEvents'](
+        mockChainKey,
         mockContract,
-        mockLastScannedBlock + 1,
+        mockLastScannedBlock + 1n,
         mockLastBlockNumber
       )
 
@@ -604,8 +596,9 @@ describe('FeeCollectionEventScraper', () => {
       // Execute and verify
       await expect(
         scraper['loadFeeCollectorEvents'](
+          mockChainKey,
           mockContract,
-          mockLastScannedBlock + 1,
+          mockLastScannedBlock + 1n,
           mockLastBlockNumber,
           2
         )
@@ -672,14 +665,12 @@ describe('FeeCollectionEventScraper', () => {
       ).mockResolvedValue(mockChainConfig)
 
       // Create large range to ensure batching
-      const startBlock = mockLastBlockNumber - CHAIN_SCAN_BLOCKS_BATCH_SIZE * 2.5
+      const startBlock = mockLastBlockNumber - BigInt(CHAIN_SCAN_BLOCKS_BATCH_SIZE * 2.5)
 
       // Execute the method
       const result = await scraper['extractAndStoreBlockEvents'](
-        startBlock,
-        mockLastBlockNumber,
-        mockContract,
-        mockChainConfig
+        mockChainConfig,
+        mockLastBlockNumber
       )
 
       // Verify the result
@@ -706,10 +697,8 @@ describe('FeeCollectionEventScraper', () => {
 
       // Execute the method
       const result = await scraper['extractAndStoreBlockEvents'](
-        mockLastScannedBlock,
-        mockLastBlockNumber,
-        mockContract,
-        mockChainConfig
+        mockChainConfig,
+        mockLastBlockNumber
       )
 
       // Verify the result

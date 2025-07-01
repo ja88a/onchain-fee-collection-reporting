@@ -8,29 +8,34 @@ import {
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { DbError } from '../database.utils'
 
+export const VersionDefaultFeesCollectedEvent = 1
+
 /**
  * Data structure for a parsed FeeCollectedEvent emitted by FeeCollector contracts
  * on any of their hosting blockchain
  */
 @modelOptions({
-  schemaOptions: { collection: 'FeeCollectionEvent' },
+  schemaOptions: { collection: 'FeeCollectionEvent', versionKey: 'schemaVersion' },
   options: { disableCaching: false, allowMixed: Severity.ALLOW },
 })
 export class FeeCollectionEventDoc extends TimeStamps {
+  /** The schema version of the document */
+  @prop({ default: VersionDefaultFeesCollectedEvent })
+  public schemaVersion?: number
+
   /** The blockchain unique key where the event was emitted */
   @prop({ required: true, index: true })
   public chainKey!: string
 
   /** Transaction Hash, an hex string, in which context the event was emitted */
-  @prop({ required: true, unique: true })
+  @prop({ required: true }) // @REVIEW How come block events' txHash is not unique? see at setting 'unique: true' in DB doc model
   public txHash!: string
 
   /** The block tag when the event was triggered
    *
-   * Depending on the blockchain, it can consist in a block number or a block hash,
-   * hence the need for the model option `allowMixed: Severity.ALLOW` */
-  @prop({ allowMixed: Severity.ALLOW })
-  public blockTag!: number | string
+   * Depending on the blockchain, it can consist in a block number or a block hash */
+  @prop({ required: true })
+  public blockTag!: string
 
   /** Onchain address of the collected token, an hex string */
   @prop()
@@ -56,7 +61,7 @@ export class FeeCollectionEventDoc extends TimeStamps {
 /**
  * Get the doc model of the LI.FI fee collection events
  */
-export const getFeeCollectionEventModel = () => {
+export const getFeeCollectionEventModel = (): mongoose.Model<FeeCollectionEventDoc> => {
   // Only get the model when the connection is established
   if (mongoose.connection.readyState !== 1) {
     throw new DbError('getFeeCollectionEventModel - MongoDB connection not ready')

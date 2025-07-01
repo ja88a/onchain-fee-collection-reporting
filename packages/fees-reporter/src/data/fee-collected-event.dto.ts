@@ -1,3 +1,5 @@
+import { Address } from 'viem/_types'
+
 /**
  * Info about FeeCollected Events emitted by FeeCollector contracts on any of their hosting blockchain
  */
@@ -6,22 +8,22 @@ export type FeeCollectedEventDto = {
   chainKey: string
 
   /** Transaction hash in which context the event was emitted */
-  txHash: string
+  txHash: `0x${string}`
 
   /** Block number, or chain specific tag, when the event was emitted */
   blockTag: string
 
   /** Address of the token that was collected */
-  token: string
+  token: Address
 
   /** Address of the integrator that triggered the fee collection */
-  integrator: string
+  integrator: Address
 
   /** the share collected for the integrator. Token amount expressed as a big number string */
-  integratorFee: string
+  integratorFee: bigint
 
   /** the share collected by LI.FI. Token amount expressed as a big number string */
-  lifiFee: string
+  lifiFee: bigint
 
   /** DB document identifier */
   docId?: string

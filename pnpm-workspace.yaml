@@ -1,5 +1,4 @@
 packages:
-  - lib/lifi-contract-types*
   - packages/**/*
   - test-e2e
 onlyBuiltDependencies:

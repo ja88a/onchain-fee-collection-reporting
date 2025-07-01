@@ -1,9 +1,11 @@
 import { getModelForClass, mongoose } from '@typegoose/typegoose'
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
-import { Severity } from '@typegoose/typegoose/lib/internal/constants'
 import { modelOptions } from '@typegoose/typegoose/lib/modelOptions'
 import { prop } from '@typegoose/typegoose/lib/prop'
+import { BlockTag } from 'viem/_types/types/block'
 import { DbError } from '../database.utils'
+
+export const VersionDefaultScrapingConfig = 1
 
 /**
  * Configuration settings for the target blockchain to scan
@@ -21,9 +23,17 @@ class ChainPropertiesDoc {
   @prop()
   public rpcUrl!: string
 
+  /** Optional private API key for the RPC provider */
+  @prop({ required: false })
+  public rpcKey?: string
+
   /** the chain specific tag enabling to get its last block number */
-  @prop({ allowMixed: Severity.ALLOW })
-  public lastBlockTag!: string | number
+  @prop()
+  public lastBlockTag!: BlockTag
+
+  /** The number of blocks to fetch in a single batch */
+  @prop({ required: true })
+  public blockBatchSize!: number
 }
 
 /**
@@ -36,11 +46,11 @@ class FeeCollectorPropertiesDoc {
 
   /** the block number from which to start seeking for FeeCollected events */
   @prop({ required: true })
-  public blockStart!: number
+  public blockStart!: string
 
   /** the number of last scanned block while seeking for onchain events */
   @prop()
-  public lastScanBlock?: number
+  public lastScanBlock?: string
 
   /** Last time a scan of block events was performed, epoch in ms */
   @prop()
@@ -51,13 +61,16 @@ class FeeCollectorPropertiesDoc {
  * Schema of the FeeCollector's blockchain configuration document
  */
 @modelOptions({
-  schemaOptions: { collection: 'FeeCollectionOnchainConfig', versionKey: 'version' },
-  options: { disableCaching: false, allowMixed: Severity.ALLOW },
+  schemaOptions: {
+    collection: 'FeeCollectionOnchainConfig',
+    versionKey: 'schemaVersion',
+  },
+  options: { disableCaching: false },
 })
 export class FeeCollectionScrapingConfigDoc extends TimeStamps {
   /** Model version number */
-  @prop({ required: true })
-  public version?: number
+  @prop({ default: VersionDefaultScrapingConfig })
+  public schemaVersion?: number
 
   /** the target blockchain key, based on LI.FI data types */
   @prop({ unique: true, index: true })

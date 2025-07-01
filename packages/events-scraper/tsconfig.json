@@ -2,6 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@repo/lib-config-typescript/permissive.json",
   "compilerOptions": {
+    "module": "node18",
+    "moduleResolution": "nodenext",
     "outDir": "./dist"
   },
   "include": ["src", "test"],
