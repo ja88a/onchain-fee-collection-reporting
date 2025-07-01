@@ -26,7 +26,7 @@ The [Hono](https://hono.dev/) app server development framework is used for build
 
 [Docker](https://docker.com) container  is used for packaging and easily managing the composition of servers to run locally.
 
-[ethers](https://docs.ethers.io/v5/) is used for connecting to EVM blockchains and for decoding the `FeeCollector.FeesCollected` events. `viem` is considered to replace the ethers v5 integration, however the technique based on lifi-contract-typings [typechain](https://github.com/TypeChain/TypeChain) for integrating the LI.FI smart contracts is still in use.
+[viem](https://viem.sh/) is used for connecting to EVM blockchains and for decoding the `FeeCollector.FeesCollected` events.
 
 [vitest](https://vitest.dev/) is used for testing the modules.
 
@@ -45,7 +45,7 @@ The [Hono](https://hono.dev/) app server development framework is used for build
 npm install -g pnpm
 ```
 
-The Docker engine and the [Docker Compose](https://docs.docker.com/compose/) tool must be installed on your OS. Please refer to the [Docker installation guide](https://docs.docker.com/get-docker/) for your OS.
+The Docker engine and [Docker Compose](https://docs.docker.com/compose/) shall be installed on your OS. You can refer to the [Docker installation guide](https://docs.docker.com/get-docker/) for your OS.
 
 ### Installation
 
@@ -56,15 +56,15 @@ To bootstrap the dev workspace, i.e. install all the necessary packages and tool
 pnpm init:workspace
 ```
 
-You can refer to the [`package.json`](./package.json) scripts for the individual commands that are run by the above command.
+You can refer to the [`package.json`](./package.json) scripts to review each individual command.
 
 ### Environment variables
 
 If not already done via `pnpm init:workspace`, you can create a `.env` file in the root dir of the project, by copying the content of the `.env.sample` file. Then, set the environment variables according to your needs.
 
-This is an optional step since default values are set, none of the environment variables require to be explicitly set.
+This is an optional step since default values are set, i.e. none of the environment variables require to be explicitly set.
 
-Notice that the variable values in `.env` enable customizing the run configuration of the scraper and the fees reporter service: against a running MongoDB instance started from previous Docker Compose based launch, but also those are used by the services when ran individually, e.g. via a node CLI command like `pnpm start` ran in sub dir packages/*.
+Notice that the variable values in `.env` enable customizing the run configuration of the scraper and the fees reporter service: against a running MongoDB instance started from previous Docker Compose based launch, but also those are used by the services when ran individually, e.g. via a node CLI command like `pnpm start` ran in sub dirs `packages/*`.
 
 ## Running the Apps Locally
 

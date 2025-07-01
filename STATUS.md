@@ -46,14 +46,9 @@ A modular, scalable system for tracking and reporting fees collected by LI.FI's 
 - **Configurability**: Flexible configuration through environment variables
 - **Logging**: JSON structured logging in production mode for better observability
 - **Developer Experience**: Comprehensive tooling, documentation, consistent integration and code style
-- **Modern Stack**: Uses contemporary technologies (Hono, Typegoose, etc.)
+- **Modern Stack**: Uses contemporary technologies (Hono, Typegoose, Viem, etc.)
 
 ## Potential Improvements
-
-### Ethers Typechain integration
-
-- **Ethers.js Integration**: Consider using viem only for blockchain interactions, tooling and typings management, instead of Ethers v5: for better performance and modern features. Using a solution such as [ABIType](https://github.com/wevm/abitype) for strong typing based on contracts ABI might be considered.
-- **Typechain Support**: Actual ethers Typechain comes from the internal @lifinance/lifi-contract-types contract that represents a big dependency in terms of package size. It also comes with a yarn package manager interfering with this repo package manager. A first solution implemented here consists in extracting the necessary types and interfaces into a separate package: refer to `@jabba01/lfcr-contract-types-feecollector`.
 
 ### Reliability
 
